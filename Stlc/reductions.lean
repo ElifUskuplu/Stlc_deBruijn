@@ -248,7 +248,7 @@ lemma para_subst_in t x u1 u2 : (para u1 u2) ∧ (lc t) → (para ([x // u1] t) 
     exact h1
     exact h2
 
-lemma para_subst t1 t2 s1 s2 : (para t1 t2) → (para s1 s2) → ∀ x, (para ([x // s1] t1) ([x // s2] t2)) := by
+lemma para_subst_all t1 t2 s1 s2 : (para t1 t2) → (para s1 s2) → ∀ x, (para ([x // s1] t1) ([x // s2] t2)) := by
   intro t1pt2 s1ps2 x
   induction t1pt2
   case para_var y =>
@@ -304,8 +304,43 @@ lemma para_abs_rule t u : lc t → lc u → (para (λ t) (λ u)) → (para t u) 
     apply para_subst_out
     exact ⟨(a x qx.1), lc_var x⟩ 
 
----------------------------
+lemma para_open_in t u (L : Finset ℕ) : 
+     lc t → lc u → 
+     (∀ x, x ∉ L → para (open₀ t ($ x)) (open₀ u ($ x))) → 
+     para t u := by
+  intro lct lcu f
+  have q := pick_fresh t (L ∪ (fv u))
+  rcases q with ⟨x, qx⟩
+  simp at qx
+  push_neg at qx
+  rw [open₀_lc t ($ x) lct, open₀_lc u ($ x) lcu]
+  exact (f x qx.1)
 
+lemma para_open_out t t' u u' (L : Finset ℕ) : 
+    (∀ x, x ∉ L → para (open₀ t ($ x)) (open₀ u ($ x))) →
+    para t' u' → para (open₀ t t') (open₀ u u') := by
+  intro f tpu'
+  have q := pick_fresh t (L ∪ (fv u))
+  rcases q with ⟨x, qx⟩
+  simp at qx
+  push_neg at qx
+  rw [subst_intro t t' (para_regular _ _ tpu').1 x qx.2.2]
+  rw [subst_intro u u' (para_regular _ _ tpu').2 x qx.2.1]
+  apply para_subst_all
+  exact (f x qx.1)
+  exact tpu'
+
+lemma open_close_para t u x y z : 
+    para t u → y ∉ ((fv t) ∪ (fv u) ∪ {x}) → 
+    para (opening z ($ y) (closing z x t)) (opening z ($ y) (closing z x u)) := by
+  intro tpu hy
+  simp at hy
+  push_neg at hy
+  rw [open_close_subst t x y (para_regular _ _ tpu).1 z]
+  rw [open_close_subst u x y (para_regular _ _ tpu).2 z]
+  apply para_subst_all _ _ _ _ tpu (para_var y)
+
+---------------------------
 --multiple-step reduction
 inductive multi_red : Trm → Trm → Prop
 | mr_refl : ∀ t, lc t → multi_red t t
@@ -468,7 +503,11 @@ lemma multi_red_subst_all t1 t2 x u1 u2 : (multi_red t1 t2) ∧ (multi_red u1 u2
      apply beta_red_subst_out
      exact ⟨s1bs2, (multi_red_regular _ _ u1mu2).2⟩
       
-lemma multi_red_through t1 t2 u1 u2 x : (x ∉ fv t1 ∧ x ∉ fv t2) → (multi_red (open₀ t1 ($ x)) (open₀ t2 ($ x))) → (multi_red u1 u2) → (multi_red (open₀ t1 u1) (open₀ t2 u2)) := by
+lemma multi_red_through t1 t2 u1 u2 x : 
+    (x ∉ fv t1 ∧ x ∉ fv t2) → 
+    (multi_red (open₀ t1 ($ x)) (open₀ t2 ($ x))) → 
+    (multi_red u1 u2) → 
+    (multi_red (open₀ t1 u1) (open₀ t2 u2)) := by
   rintro ⟨h1, h2⟩ f g 
   rw [subst_intro t1 u1 (multi_red_regular _ _ g).1 x h1]
   rw [subst_intro t2 u2 (multi_red_regular _ _ g).2 x h2]

@@ -13,6 +13,7 @@ def opening (x : ℕ) (a : Trm) : Trm → Trm
 | fvar i => fvar i
 | abs u => abs (opening (x + 1) a u)
 | app u1 u2 => app (opening x a u1) (opening x a u2)
+ 
 
 notation " {" x " ~> " a "} " u => opening x a u
 
@@ -415,3 +416,35 @@ lemma open_lc : ∀ t u, lc (abs t) → lc u → lc (open₀ t u) := by
   rw [lc_abs_iff_body t] at lcat
   exact (open_body t u lcat lcu)
 
+lemma open_close_subst t x y : lc t → (∀ z, (opening z ($ y) (closing z x t)) = ([x // ($ y)] t)) := by
+  intro lct
+  induction lct
+  case lc_var k =>
+    simp only [closing, subst]
+    by_cases hxk : x = k
+    . simp [if_pos hxk, if_pos hxk.symm]
+    . have hkx : k ≠ x := (fun p => (hxk p.symm)) 
+      simp [if_neg hxk, if_neg hkx]
+  case lc_abs s L f h =>
+    simp only [opening, subst, abs.injEq]
+    intro z
+    have q := pick_fresh s (L ∪ {x} ∪ (fv ( {z + 1 ~> $ y} { z + 1 <~ x } s)) ∪ (fv ([x // $ y] s)))
+    rcases q with ⟨w, qw⟩
+    simp at qw
+    push_neg at qw
+    have hwx : x ≠ w := (fun p => (qw.2.1 p.symm))
+    have fact := h w qw.1 (z + 1)
+    rw [← subst_open_var _ _ (lc_var y) _ _ hwx, open₀] at fact
+    rw [← open_close_core_fact _ _ _ _ hwx, ← open₀] at fact
+    apply open₀_injective w _ _ 
+    exact qw.2.2.1
+    exact qw.2.2.2.1
+    exact fact
+    exact qw.2.2.2.2
+    exact Nat.ne_of_beq_eq_false rfl
+  case lc_app u1 u2 _ _ f1 f2 =>
+    intro z
+    simp only [opening, subst, app.injEq]
+    exact ⟨f1 z, f2 z⟩  
+
+    
