@@ -185,69 +185,6 @@ lemma lc_para_refl : ∀ t, lc t → para t t := by
   case lc_app u1 u2 _ _ h h' =>
     exact (para_app u1 u1 u2 u2 h h')
 
-lemma para_subst_out t1 t2 x u : (para t1 t2) ∧ (lc u) → (para ([x // u] t1) ([x // u] t2)) := by
-  intro ⟨t1pt2, lcu⟩
-  induction t1pt2
-  case para_var y =>
-    simp only [subst]
-    by_cases hyx : y = x
-    . simp only [if_pos hyx]
-      exact (lc_para_refl u lcu)
-    . simp only [if_neg hyx]
-      exact (para_var y)
-  case para_red s1 s1' s2 s2' L f s2ps2' g h =>
-    simp only [subst]
-    simp [open₀, (subst_open_rec _ _ _ x  0 lcu)]
-    rw [← open₀]
-    apply para_red _ _ _ _ (L ∪ {x})
-    intro y hy
-    simp at hy
-    push_neg at hy
-    have p : x ≠ y := (fun q => (hy.2 q.symm))
-    rw [subst_open_var s1 u lcu x y p, subst_open_var s1' u lcu x y p] 
-    exact (g y hy.1)
-    exact h
-  case para_app s1 s1' s2 s2' s1ps1' s2ps2' f g =>
-    simp only [subst]
-    apply para_app
-    exact f
-    exact g
-  case para_abs s1 s1' L f g =>
-    simp only [subst] at g ⊢ 
-    apply para_abs _ _ (L ∪ {x})
-    intro y hy
-    simp at hy
-    push_neg at hy
-    have p : x ≠ y := (fun q => (hy.2 q.symm))
-    rw [subst_open_var _ _ lcu x y p , subst_open_var _ _ lcu x y p]
-    exact (g y hy.1)
-
-lemma para_subst_in t x u1 u2 : (para u1 u2) ∧ (lc t) → (para ([x // u1] t) ([x // u2] t)) := by
-  intro ⟨u1pu2, lct⟩
-  induction lct
-  case lc_var y =>
-    simp only [subst]
-    by_cases hyx : y = x
-    . simp only [if_pos hyx]
-      exact u1pu2
-    . simp only [if_neg hyx]
-      exact (para_var y)
-  case lc_abs t' L f h =>
-    simp only [subst]
-    apply para_abs _ _ (L ∪ {x})
-    intro y hy
-    simp at hy
-    push_neg at hy
-    have p : x ≠ y := (fun q => (hy.2 q.symm))
-    rw [subst_open_var t' u1 (para_regular _ _ u1pu2).1 x y p] 
-    rw [subst_open_var t' u2 (para_regular _ _ u1pu2).2 x y p]
-    exact (h y hy.1)
-  case lc_app s1 s2 lcs1 lcs2 h1 h2 =>
-    simp only [subst]
-    apply para_app
-    exact h1
-    exact h2
-
 lemma para_subst_all t1 t2 s1 s2 : (para t1 t2) → (para s1 s2) → ∀ x, (para ([x // s1] t1) ([x // s2] t2)) := by
   intro t1pt2 s1ps2 x
   induction t1pt2
@@ -287,35 +224,6 @@ lemma para_subst_all t1 t2 s1 s2 : (para t1 t2) → (para s1 s2) → ∀ x, (par
     exact (para_regular _ _ s1ps2).2
     exact (para_regular _ _ s1ps2).1
 
-lemma para_abs_rule t u : lc t → lc u → (para (λ t) (λ u)) → (para t u) := by
-  intro lct lcu tpu
-  cases tpu
-  next L a =>
-    have q := pick_fresh t (L ∪ (fv u))
-    rcases q with ⟨x, qx⟩
-    simp at qx
-    push_neg at qx
-    have q' := pick_fresh t (L ∪ (fv u) ∪ {x})
-    rcases q' with ⟨y, qy⟩
-    simp at qy
-    push_neg at qy
-    rw [← subst_fresh t ($ x) y qy.2.2.2, open₀_lc _ ($ x) lct]
-    rw [← subst_fresh u ($ x) y qy.2.1, open₀_lc _ ($ x) lcu]
-    apply para_subst_out
-    exact ⟨(a x qx.1), lc_var x⟩ 
-
-lemma para_open_in t u (L : Finset ℕ) : 
-     lc t → lc u → 
-     (∀ x, x ∉ L → para (open₀ t ($ x)) (open₀ u ($ x))) → 
-     para t u := by
-  intro lct lcu f
-  have q := pick_fresh t (L ∪ (fv u))
-  rcases q with ⟨x, qx⟩
-  simp at qx
-  push_neg at qx
-  rw [open₀_lc t ($ x) lct, open₀_lc u ($ x) lcu]
-  exact (f x qx.1)
-
 lemma para_open_out t t' u u' (L : Finset ℕ) : 
     (∀ x, x ∉ L → para (open₀ t ($ x)) (open₀ u ($ x))) →
     para t' u' → para (open₀ t t') (open₀ u u') := by
@@ -330,7 +238,7 @@ lemma para_open_out t t' u u' (L : Finset ℕ) :
   exact (f x qx.1)
   exact tpu'
 
-lemma open_close_para t u x y z : 
+lemma opening_closing_para t u x y z : 
     para t u → y ∉ ((fv t) ∪ (fv u) ∪ {x}) → 
     para (opening z ($ y) (closing z x t)) (opening z ($ y) (closing z x u)) := by
   intro tpu hy
@@ -339,6 +247,22 @@ lemma open_close_para t u x y z :
   rw [open_close_subst t x y (para_regular _ _ tpu).1 z]
   rw [open_close_subst u x y (para_regular _ _ tpu).2 z]
   apply para_subst_all _ _ _ _ tpu (para_var y)
+
+lemma open_close_para t u x y : 
+    para t u → y ∉ ((fv t) ∪ (fv u) ∪ {x}) → 
+    para (open₀ (close₀ t x) ($ y)) (open₀ (close₀ u x) ($ y)) := opening_closing_para t u x y 0
+
+lemma para_through t1 t2 u1 u2 x : 
+    (x ∉ fv t1 ∧ x ∉ fv t2) → 
+    (para (open₀ t1 ($ x)) (open₀ t2 ($ x))) → 
+    (para u1 u2) → 
+    (para (open₀ t1 u1) (open₀ t2 u2)) := by
+  rintro ⟨h1, h2⟩ f g 
+  rw [subst_intro t1 u1 (para_regular _ _ g).1 x h1]
+  rw [subst_intro t2 u2 (para_regular _ _ g).2 x h2]
+  apply para_subst_all 
+  exact f
+  exact g
 
 ---------------------------
 --multiple-step reduction
