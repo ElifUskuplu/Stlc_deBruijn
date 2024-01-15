@@ -2,9 +2,9 @@ import Stlc.basics
 
 namespace Trm
 
-/- Variable opening turns some bound variables into free variables. 
-It is used to investigate the body of an abstraction. 
-Variable closing turns some free variables into bound variables. 
+/- Variable opening turns some bound variables into free variables.
+It is used to investigate the body of an abstraction.
+Variable closing turns some free variables into bound variables.
 It is used to build an abstraction given a representation of its body. -/
 
 @[simp]
@@ -13,14 +13,14 @@ def opening (x : ℕ) (a : Trm) : Trm → Trm
 | fvar i => fvar i
 | abs u => abs (opening (x + 1) a u)
 | app u1 u2 => app (opening x a u1) (opening x a u2)
- 
 
 notation " {" x " ~> " a "} " u => opening x a u
 
 --Opening at index zero
-def open₀ u a := opening 0 a u 
+def open₀ u a := opening 0 a u
 
-lemma open_var_fv (t u: Trm) : (j : ℕ) → fv (opening j u t) ⊆ (fv t) ∪ (fv u) := by
+lemma open_var_fv (t u: Trm) :
+    (j : ℕ) → fv (opening j u t) ⊆ (fv t) ∪ (fv u) := by
   induction t
   case bvar i =>
     intro j
@@ -30,7 +30,7 @@ lemma open_var_fv (t u: Trm) : (j : ℕ) → fv (opening j u t) ⊆ (fv t) ∪ (
       simp
     . rw [if_neg h, fv]
       simp
-  case fvar i => 
+  case fvar i =>
     simp [opening, fv]
   case abs s hs =>
     simp [opening, fv]
@@ -45,8 +45,10 @@ lemma open_var_fv (t u: Trm) : (j : ℕ) → fv (opening j u t) ⊆ (fv t) ∪ (
     rw [Finset.union_comm]
     simp
 
-lemma opening_lc_core (e a b : Trm) : (i j: ℕ) → i ≠ j → 
-  ({j ~> a} e) = ({i ~> b} ({j ~> a} e)) → e = ({i ~> b} e) := by
+lemma opening_lc_lemma (e a b : Trm) :
+    (i j: ℕ) → i ≠ j
+    → ({j ~> a} e) = ({i ~> b} ({j ~> a} e))
+    → e = ({i ~> b} e) := by
   induction e
   case bvar y =>
    intro i j neqij h
@@ -60,7 +62,7 @@ lemma opening_lc_core (e a b : Trm) : (i j: ℕ) → i ≠ j →
      rw [if_neg]
      exact hiy
   case fvar y =>
-   intro i j _ _ 
+   intro i j _ _
    rfl
   case abs u hu =>
    intro i j neqij h
@@ -86,9 +88,10 @@ def closing (k x : ℕ) : Trm → Trm
 notation " { " k " <~ " x " } " u => closing k x u
 
 --Closing at index zero
-def close₀ u a := closing 0 a u 
+def close₀ u a := closing 0 a u
 
-lemma close_var_fv (t : Trm) (x : ℕ) : (j : ℕ) → fv (closing j x t) = (fv t) \ {x} := by
+lemma close_var_fv (t : Trm) (x : ℕ) :
+    (j : ℕ) → fv (closing j x t) = (fv t) \ {x} := by
   induction t
   case bvar _ =>
     simp [closing, fv]
@@ -114,31 +117,32 @@ lemma close_var_fv (t : Trm) (x : ℕ) : (j : ℕ) → fv (closing j x t) = (fv 
 --Locally closed terms
 inductive lc : Trm → Prop
 | lc_var : ∀ x : ℕ, lc (fvar x)
-| lc_abs : ∀ a : Trm, ∀ L : Finset ℕ, 
+| lc_abs : ∀ a : Trm, ∀ L : Finset ℕ,
    (∀ x : ℕ, x ∉ L → lc (open₀ a ($ x))) → lc (abs a)
 | lc_app : ∀ u1 u2 : Trm, lc u1 → lc u2 → lc (app u1 u2)
 
 open lc
 
-/-The predicate “body t” asserts that t describes 
+/-The predicate “body t” asserts that t describes
 the body of a locally closed abstraction.-/
-def body t := ∃ (L : Finset ℕ), ∀ x, x ∉ L → lc (open₀ t ($ x)) 
+def body t := ∃ (L : Finset ℕ), ∀ x, x ∉ L → lc (open₀ t ($ x))
 
 lemma lc_abs_iff_body : ∀ t, lc (abs t) ↔ body t := by
   intro t
   constructor
   . intro h
-    cases h 
+    cases h
     next L a =>
       use L
-      exact a          
-  . rintro ⟨L, h⟩ 
+      exact a
+  . rintro ⟨L, h⟩
     exact (lc_abs t L h)
-----------------------------------------------------------------------   
-/-The following lemmas show that opening and closing 
+----------------------------------------------------------------------
+/-The following lemmas show that opening and closing
 are inverses of each other on variables.-/
 --1) Close(Open)=Id
-lemma close_open (x : ℕ) (t : Trm) : x ∉ fv t → (j : ℕ) → closing j x (opening j ($ x) t) = t := by
+lemma close_open (x : ℕ) (t : Trm) :
+    x ∉ fv t → (j : ℕ) → closing j x (opening j ($ x) t) = t := by
   intro hx
   induction t
   case bvar i =>
@@ -149,24 +153,24 @@ lemma close_open (x : ℕ) (t : Trm) : x ∉ fv t → (j : ℕ) → closing j x 
       simp only [closing, ite_true, bvar.injEq, hi]
       exact hi
     . rw [if_neg]
-      simp only [closing]  
+      simp only [closing]
       exact hi
   case fvar i =>
     simp [opening, closing]
     simp [fv] at hx
-    exact hx 
+    exact hx
   case abs u hu =>
-    simp [opening, closing] at hu ⊢ 
+    simp [opening, closing] at hu ⊢
     rw [fv] at hx
     exact (fun p => hu hx (p + 1))
   case app u1 u2 hu1 hu2 =>
     simp [opening, closing]
     simp [fv] at hx
     push_neg at hx
-    exact (fun p => ⟨hu1 hx.1 p, hu2 hx.2 p⟩) 
+    exact (fun p => ⟨hu1 hx.1 p, hu2 hx.2 p⟩)
 
---special case of close_open at j=0    
-lemma close_open_var (x : ℕ) (t : Trm) : 
+--special case of close_open at j=0
+lemma close_open_var (x : ℕ) (t : Trm) :
     x ∉ fv t → close₀ (open₀ t ($ x)) x = t := fun hx => close_open x t hx 0
 
 --Using this fact, we can show open₀ is injective on terms.
@@ -180,9 +184,9 @@ lemma open₀_injective (x : ℕ) (t1 t2 : Trm) :
 ----------------------------------------------------------------------
 --2) Open(Close)=Id
 --First, we need a lemma.
-lemma open_close_core_fact (x y z : ℕ) (t : Trm) : x ≠ y → y ∉ fv t → 
-    ((i j : ℕ) → i ≠ j → ({ i ~> ($ y)} ({j ~> ($ z)} ({j <~ x} t))) = 
-       ({j ~> ($ z)} ({j <~ x} ({i ~> ($ y)} t))) ):= by
+lemma open_close_lemma (x y z : ℕ) (t : Trm) : x ≠ y → y ∉ fv t
+    → ((i j : ℕ) → i ≠ j → ({ i ~> ($ y)} ({j ~> ($ z)} ({j <~ x} t)))
+      = ({j ~> ($ z)} ({j <~ x} ({i ~> ($ y)} t))) ):= by
   intro neqxy hy
   induction t
   case bvar a =>
@@ -221,9 +225,10 @@ lemma open_close_core_fact (x y z : ℕ) (t : Trm) : x ≠ y → y ∉ fv t →
     simp only [opening, app.injEq]
     simp [fv] at hy
     push_neg at hy
-    exact ⟨hu1 hy.1 i j neqij, hu2 hy.2 i j neqij⟩  
+    exact ⟨hu1 hy.1 i j neqij, hu2 hy.2 i j neqij⟩
 
-lemma open_close (x : ℕ) (t : Trm) : lc t → (j : ℕ) → opening j ($ x) (closing j x t) = t := by
+lemma open_close (x : ℕ) (t : Trm) :
+    lc t → (j : ℕ) → opening j ($ x) (closing j x t) = t := by
   intro lct
   induction lct
   case lc_var y =>
@@ -239,14 +244,13 @@ lemma open_close (x : ℕ) (t : Trm) : lc t → (j : ℕ) → opening j ($ x) (c
   case lc_abs u L _ hu =>
     intro j
     simp [closing, opening]
-    have z := pick_fresh u (L ∪ (fv ($ x)) ∪ (fv (( {j + 1 ~> $ x} { j + 1 <~ x } u))))
-    rcases z with ⟨y, hy⟩
+    let ⟨y, hy⟩ := pick_fresh u (L ∪ (fv ($ x)) ∪ (fv (( {j + 1 ~> $ x} { j + 1 <~ x } u))))
     simp at hy
     push_neg at hy
     apply (open₀_injective y ( {j + 1 ~> $ x} { j + 1 <~ x } u)  u (hy.2.2.1) (hy.2.2.2))
     rw [← (hu y (hy.1) (j + 1))]
     simp [open₀]
-    apply (open_close_core_fact x y x u)
+    apply (open_close_lemma x y x u)
     have hyx := hy.2.1
     simp [fv] at hyx
     exact (fun p => hyx p.symm)
@@ -255,10 +259,10 @@ lemma open_close (x : ℕ) (t : Trm) : lc t → (j : ℕ) → opening j ($ x) (c
   case lc_app u1 u2 _ _ hu1 hu2 =>
     intro j
     simp [opening, closing]
-    exact ⟨hu1 j, hu2 j⟩ 
+    exact ⟨hu1 j, hu2 j⟩
 
---special case of open_close at j=0    
-lemma open_close_var (x : ℕ) (t : Trm) : 
+--special case of open_close at j=0
+lemma open_close_var (x : ℕ) (t : Trm) :
     lc t → open₀ (close₀ t x) ($ x) = t := by
   intro lct
   exact (open_close x t lct 0)
@@ -274,7 +278,7 @@ lemma closing_injective (x i : ℕ) (t1 t2 : Trm) :
 -----------------------------------------
 --Auxilary lemma about opening
 lemma opening_lc (e a : Trm) : lc e → (i : ℕ) → (e = {i ~> a} e) := by
-  intro lce 
+  intro lce
   induction lce
   case lc_var x =>
     intro _
@@ -286,23 +290,23 @@ lemma opening_lc (e a : Trm) : lc e → (i : ℕ) → (e = {i ~> a} e) := by
     have  ⟨x, hx⟩ : ∃ x : ℕ, x ∉ L := by
       exact Infinite.exists_not_mem_finset L
     have t : u = { i + 1 ~> a } u := by
-      apply (opening_lc_core u ($ x) a (i + 1) 0)
+      apply (opening_lc_lemma u ($ x) a (i + 1) 0)
       exact Nat.succ_ne_zero i
       exact (hu x hx (i + 1))
-    rw [← t] 
+    rw [← t]
   case lc_app u1 u2 _ _ hu1 hu2 =>
     intro i
     simp [opening]
-    exact ⟨hu1 i, hu2 i⟩  
+    exact ⟨hu1 i, hu2 i⟩
 
 lemma open₀_lc (e a : Trm) : lc e → (e = open₀ e a) := by
   intro lce
   simp [open₀]
-  apply (opening_lc e a lce 0) 
+  apply (opening_lc e a lce 0)
 
 --Free variable substitution distributes over index substitution.
-lemma subst_open_rec (e1 e2 a : Trm) : (i j : ℕ) → lc a →
-   ([i // a] ({j ~> e2} e1)) = ({j ~> [i // a] e2} ([i // a] e1)) := by
+lemma subst_open_rec (e1 e2 a : Trm) : (i j : ℕ) → lc a
+    → ([i // a] ({j ~> e2} e1)) = ({j ~> [i // a] e2} ([i // a] e1)) := by
   induction e1
   case bvar y =>
    intro i j _
@@ -311,7 +315,7 @@ lemma subst_open_rec (e1 e2 a : Trm) : (i j : ℕ) → lc a →
      rw [if_pos, if_pos] <;> exact hjy
    . simp [opening]
      rw [if_neg, if_neg, subst]
-     <;> exact hjy 
+     <;> exact hjy
   case fvar y =>
    intro i j lca
    by_cases hyi : (y = i)
@@ -330,12 +334,12 @@ lemma subst_open_rec (e1 e2 a : Trm) : (i j : ℕ) → lc a →
   case app u1 u2 hu1 hu2 =>
    intro i j lca
    simp [opening, subst]
-   exact ⟨hu1 i j lca, hu2 i j lca ⟩ 
+   exact ⟨hu1 i j lca, hu2 i j lca ⟩
 
---The lemma above is most often used with k = 0 and e2 as some fresh variable. 
+--The lemma above is most often used with k = 0 and e2 as some fresh variable.
 --Therefore, it simplifies matters to define the following useful corollary.
-lemma subst_open_var (e a : Trm) : lc a → (i j : ℕ) → i ≠ j →
-    (open₀ ([i // a] e) ($ j)) = ([i // a] (open₀ e ($ j))) := by
+lemma subst_open_var (e a : Trm) : lc a → (i j : ℕ) → i ≠ j
+    → (open₀ ([i // a] e) ($ j)) = ([i // a] (open₀ e ($ j))) := by
   intro lca i j neqij
   simp [open₀]
   rw [subst_open_rec e ($ j) a i 0 lca]
@@ -343,10 +347,10 @@ lemma subst_open_var (e a : Trm) : lc a → (i j : ℕ) → i ≠ j →
   exact (fun p => neqij (Eq.symm p))
 
 
---When we open a term, we can instead open the term with a fresh variable and 
+--When we open a term, we can instead open the term with a fresh variable and
 --then substitute for that variable.
-lemma subst_intro (e a : Trm) : lc a → (i : ℕ) → i ∉ (fv e) → 
-    (open₀ e a) = ([i // a] (open₀ e ($ i))) := by
+lemma subst_intro (e a : Trm) : lc a → (i : ℕ) → i ∉ (fv e)
+    → (open₀ e a) = ([i // a] (open₀ e ($ i))) := by
   intro lca i hi
   simp [open₀]
   rw [subst_open_rec e ($ i) a i 0 lca]
@@ -378,13 +382,13 @@ lemma subst_lc (e a : Trm) : (x : ℕ) → lc e → lc a → lc ([x // a] e) := 
       push_neg at hx₀
       exact hx₀.2
     rw [subst_open_var u a lca x x₀ t2.symm]
-    exact (hu x₀ t1)  
+    exact (hu x₀ t1)
   case lc_app u1 u2 lcu1 lcu2 hu1 hu2 =>
     dsimp [subst]
     apply (lc_app ( [ x // a ] u1) ( [ x // a ] u2) hu1 hu2)
 
 lemma open_var_body : ∀ x t, body t → lc (open₀ t ($ x)) := by
-  intro x t bt 
+  intro x t bt
   rcases bt with ⟨L , a⟩
   have ⟨y, hy⟩ : ∃ y : ℕ, y ∉ (L ∪ {x} ∪ (fv t)) := by
       exact Infinite.exists_not_mem_finset (L ∪ {x} ∪ (fv t))
@@ -416,27 +420,27 @@ lemma open_lc : ∀ t u, lc (abs t) → lc u → lc (open₀ t u) := by
   rw [lc_abs_iff_body t] at lcat
   exact (open_body t u lcat lcu)
 
-lemma open_close_subst t x y : lc t → (∀ z, (opening z ($ y) (closing z x t)) = ([x // ($ y)] t)) := by
+lemma open_close_subst t x y :
+    lc t → (∀ z, (opening z ($ y) (closing z x t)) = ([x // ($ y)] t)) := by
   intro lct
   induction lct
   case lc_var k =>
     simp only [closing, subst]
     by_cases hxk : x = k
     . simp [if_pos hxk, if_pos hxk.symm]
-    . have hkx : k ≠ x := (fun p => (hxk p.symm)) 
+    . have hkx : k ≠ x := (fun p => (hxk p.symm))
       simp [if_neg hxk, if_neg hkx]
   case lc_abs s L f h =>
     simp only [opening, subst, abs.injEq]
     intro z
-    have q := pick_fresh s (L ∪ {x} ∪ (fv ( {z + 1 ~> $ y} { z + 1 <~ x } s)) ∪ (fv ([x // $ y] s)))
-    rcases q with ⟨w, qw⟩
+    let ⟨w, qw⟩ := pick_fresh s (L ∪ {x} ∪ (fv ( {z + 1 ~> $ y} { z + 1 <~ x } s)) ∪ (fv ([x // $ y] s)))
     simp at qw
     push_neg at qw
     have hwx : x ≠ w := (fun p => (qw.2.1 p.symm))
     have fact := h w qw.1 (z + 1)
     rw [← subst_open_var _ _ (lc_var y) _ _ hwx, open₀] at fact
-    rw [← open_close_core_fact _ _ _ _ hwx, ← open₀] at fact
-    apply open₀_injective w _ _ 
+    rw [← open_close_lemma _ _ _ _ hwx, ← open₀] at fact
+    apply open₀_injective w _ _
     exact qw.2.2.1
     exact qw.2.2.2.1
     exact fact
@@ -445,6 +449,4 @@ lemma open_close_subst t x y : lc t → (∀ z, (opening z ($ y) (closing z x t)
   case lc_app u1 u2 _ _ f1 f2 =>
     intro z
     simp only [opening, subst, app.injEq]
-    exact ⟨f1 z, f2 z⟩  
-
-    
+    exact ⟨f1 z, f2 z⟩

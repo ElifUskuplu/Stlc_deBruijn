@@ -1,11 +1,10 @@
 import Mathlib.Tactic
-import Mathlib.Data.Finset.Basic
 
 -- Basic types --
-inductive Typ : Type 
+inductive Typ : Type
 | typ_base : Typ
 | typ_arrow : Typ → Typ → Typ
-deriving Repr
+deriving DecidableEq, Repr
 
 -- Defining (pre)terms by recursion --
 inductive Trm : Type
@@ -13,14 +12,14 @@ inductive Trm : Type
 | fvar : ℕ → Trm
 | abs : Trm → Trm
 | app : Trm → Trm → Trm
-deriving Repr
+deriving DecidableEq, Repr
 
 namespace Trm
 
 -- Notations --
 notation t1 " -> " t2 => Typ.typ_arrow t1 t2
-notation "€" t => bvar t 
-notation "$" t => fvar t 
+notation "€" t => bvar t
+notation "$" t => fvar t
 notation "λ" t => abs t
 notation t1 " @ " t2 => app t1 t2
 
@@ -34,12 +33,8 @@ def subst (x : ℕ) (a : Trm) : Trm → Trm
 
 notation  "["x" // " a"] "u => subst x a u
 
-#eval [7 // €5] (λ $7) @ ($9)
-
-example : ([7 // €5] (λ $7) @ ($9)) = (λ €5) @ ($9) := rfl 
-
 -- Free variables --
-def fv : Trm → Finset ℕ 
+def fv : Trm → Finset ℕ
 | bvar _ => {}
 | fvar y => {y}
 | abs u => fv u
@@ -47,7 +42,7 @@ def fv : Trm → Finset ℕ
 
 --We can always pick a fresh variable for a given term out of a fixed set.
 lemma pick_fresh (t : Trm) (L : Finset ℕ) : ∃ (x : ℕ), x ∉ (L ∪ fv t) := by
-  exact Infinite.exists_not_mem_finset (L ∪ fv t) 
+  exact Infinite.exists_not_mem_finset (L ∪ fv t)
 
 -- If a variable does not appear free in a term, then substituting for it has no effect --
 lemma subst_fresh (t s : Trm) (y : ℕ) (h : y ∉ (fv t)) : ([y // s] t) = t := by
@@ -58,7 +53,7 @@ lemma subst_fresh (t s : Trm) (y : ℕ) (h : y ∉ (fv t)) : ([y // s] t) = t :=
     simp only [subst]
     rw [if_neg]
     simp [fv] at h
-    exact (fun p => h (p.symm)) 
+    exact (fun p => h (p.symm))
   case abs u hu =>
     simp only [subst, abs.injEq]
     exact (hu h)

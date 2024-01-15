@@ -2,8 +2,6 @@ import Stlc.basics
 import Stlc.open_close
 import Stlc.context
 import Stlc.typing
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.List.Basic
 
 open Typ
 open Trm
@@ -58,8 +56,6 @@ lemma eval_regular (e1 e2 : Trm) : eval e1 e2 → lc e1 ∧ lc e2  := by
       exact lc1
       exact f.2
 
-notation t1 " cbv-> " t2 => (eval t1 t2) 
-
 lemma preservation E e T : typing E e T → ((e' : Trm) →  eval e e' → typing E e' T) := by
   intro H
   induction H
@@ -76,8 +72,7 @@ lemma preservation E e T : typing E e T → ((e' : Trm) →  eval e e' → typin
       cases f1
       next L h =>
         simp only
-        have w := pick_fresh e1 L
-        rcases w with ⟨x, hx⟩
+        let ⟨x, hx⟩ := pick_fresh e1 L
         have q : lc t2 := by
           apply (typing_regular _ _ _ f2)
         simp at hx
@@ -94,7 +89,7 @@ lemma preservation E e T : typing E e T → ((e' : Trm) →  eval e e' → typin
       apply typ_app
       exact f1
       apply (h2 e2 eve2)
-      
+
 lemma progress e T : typing [] e T → (value e) ∨ (∃ e', eval e e') := by
   intro H
   generalize p : [] = Γ at H
@@ -104,7 +99,7 @@ lemma progress e T : typing [] e T → (value e) ∨ (∃ e', eval e e') := by
   case typ_abs L Δ s S1 S2 f _ =>
     left
     apply value_abs
-    apply lc_abs s L 
+    apply lc_abs s L
     intro x hx
     exact (typing_regular _ _ _ (f x hx))
   case typ_app Δ s1 s2 S1 S2 f g h1 h2 =>
@@ -120,13 +115,13 @@ lemma progress e T : typing [] e T → (value e) ∨ (∃ e', eval e e') := by
           exact lcs3
           exact val2
       . simp [val2] at h2
-        rcases h2 with ⟨s3 , hs3⟩  
+        rcases h2 with ⟨s3 , hs3⟩
         use (s1 @ s3)
         apply eval_app2
         exact (value_regular _ val1)
         exact hs3
     . simp [val1] at h1
-      rcases h1 with ⟨s3 , hs3⟩  
+      rcases h1 with ⟨s3 , hs3⟩
       use (s3 @ s2)
       apply eval_app1
       exact (typing_regular _ _ _ g)

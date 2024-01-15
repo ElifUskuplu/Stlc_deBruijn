@@ -1,14 +1,10 @@
 import Stlc.basics
 import Stlc.open_close
 import Stlc.context
-import Stlc.typing
-import Mathlib.Data.Finset.Basic
-import Mathlib.Data.List.Basic
 
 open Typ
 open Trm
 open valid_ctx
-open typing
 open lc
 
 /- # Different Forms of β-reductions -/
@@ -16,9 +12,9 @@ open lc
 --full beta reduction
 inductive beta_red : Trm → Trm → Prop
 | br_beta : ∀ t1 t2, lc (abs t1) → lc t2 → beta_red (app (abs t1) t2) (open₀ t1 t2)
-| br_app1 : ∀ t1 t1' t2, lc t2 → beta_red t1 t1' → beta_red (app t1 t2) (app t1' t2)  
+| br_app1 : ∀ t1 t1' t2, lc t2 → beta_red t1 t1' → beta_red (app t1 t2) (app t1' t2)
 | br_app2 : ∀ t1 t2 t2', lc t1 → beta_red t2 t2' → beta_red (app t1 t2) (app t1 t2')
-| br_abs : ∀ t1 t1' (L : Finset ℕ), 
+| br_abs : ∀ t1 t1' (L : Finset ℕ),
     (∀ x, x ∉ L → beta_red (open₀ t1 ($ x)) (open₀ t1' ($ x))) → beta_red (abs t1) (abs t1')
 
 open beta_red
@@ -31,15 +27,16 @@ lemma beta_red_regular : ∀ t1 t2, (beta_red t1 t2) → (lc t1) ∧ (lc t2) := 
     exact (lc_app (abs s1) s2 lcas1 lcs2)
     exact (open_lc s1 s2 lcas1 lcs2)
   case br_app1 s1 s1' s2 lcs2 _ h =>
-    exact ⟨lc_app s1 s2 h.1 lcs2, lc_app s1' s2 h.2 lcs2⟩ 
+    exact ⟨lc_app s1 s2 h.1 lcs2, lc_app s1' s2 h.2 lcs2⟩
   case br_app2 s1 s2 s2' lcs1 _ h =>
-    exact ⟨lc_app s1 s2 lcs1 h.1, lc_app s1 s2' lcs1 h.2⟩ 
+    exact ⟨lc_app s1 s2 lcs1 h.1, lc_app s1 s2' lcs1 h.2⟩
   case br_abs s1 s1' L _ h =>
     constructor
     . apply (lc_abs s1 L (fun x hx => (h x hx).1))
-    . apply (lc_abs s1' L (fun x hx => (h x hx).2)) 
+    . apply (lc_abs s1' L (fun x hx => (h x hx).2))
 
-lemma beta_rename t1 t2 x y : beta_red t1 t2 → beta_red ([x // ($ y)] t1) ([x // ($ y)] t2) := by
+lemma beta_rename t1 t2 x y : beta_red t1 t2
+    → beta_red ([x // ($ y)] t1) ([x // ($ y)] t2) := by
   intro R
   induction R
   case br_beta s1 s2 lc1 lc2 =>
@@ -78,7 +75,9 @@ lemma beta_rename t1 t2 x y : beta_red t1 t2 → beta_red ([x // ($ y)] t1) ([x 
     simp [subst_open_var s1' ($ y) (lc_var y) x z hz.2.symm]
     exact (f z hz.1)
 
-lemma beta_abs_intro t1 t2 x : beta_red (open₀ t1 ($ x)) (open₀ t2 ($ x)) → x ∉ fv t1 → x ∉ fv t2 → beta_red (λ t1) (λ t2) := by
+lemma beta_abs_intro t1 t2 x :
+    beta_red (open₀ t1 ($ x)) (open₀ t2 ($ x))
+    → x ∉ fv t1 → x ∉ fv t2 → beta_red (λ t1) (λ t2) := by
   intro R fx1 fx2
   apply br_abs t1 t2 ∅
   intro y _
@@ -88,7 +87,9 @@ lemma beta_abs_intro t1 t2 x : beta_red (open₀ t1 ($ x)) (open₀ t2 ($ x)) �
   exact (lc_var y)
   exact (lc_var y)
 
-lemma beta_red_subst_out t1 t2 x u : (beta_red t1 t2) ∧ (lc u) → (beta_red ([x // u] t1) ([x // u] t2)) := by
+lemma beta_red_subst_out t1 t2 x u :
+    (beta_red t1 t2) ∧ (lc u)
+    → (beta_red ([x // u] t1) ([x // u] t2)) := by
   rintro ⟨t1bt2, lcu⟩
   induction t1bt2
   case br_beta s1 s2 lc1 lc2 =>
@@ -122,8 +123,7 @@ lemma beta_red_subst_out t1 t2 x u : (beta_red t1 t2) ∧ (lc u) → (beta_red (
     exact f
   case br_abs s1 s2 L f h =>
     simp only [subst]
-    have w := pick_fresh ([x // u] s1) (L ∪ (fv ([x // u] s2)) ∪ {x})
-    rcases w with ⟨y, hy⟩ 
+    let ⟨y, hy⟩ := pick_fresh ([x // u] s1) (L ∪ (fv ([x // u] s2)) ∪ {x})
     apply beta_abs_intro _ _ y
     simp at hy
     push_neg at hy
@@ -136,7 +136,7 @@ lemma beta_red_subst_out t1 t2 x u : (beta_red t1 t2) ∧ (lc u) → (beta_red (
     exact hy.2.2.2
     simp at hy
     push_neg at hy
-    exact hy.2.1    
+    exact hy.2.1
 
 -------------------------
 
@@ -168,7 +168,7 @@ lemma para_regular : ∀ t1 t2, (para t1 t2) → (lc t1) ∧ (lc t2) := by
       exact (lc_abs s1' L (fun x hx => (h x hx).2))
       exact h'.2
   case para_app s1 s1' s2 s2' _ _ h1 h2 =>
-    exact ⟨lc_app s1 s2 h1.1 h2.1, lc_app s1' s2' h1.2 h2.2⟩ 
+    exact ⟨lc_app s1 s2 h1.1 h2.1, lc_app s1' s2' h1.2 h2.2⟩
   case para_abs s1 s1' L _ h =>
     constructor
     . exact (lc_abs s1 L (fun x hx => (h x hx).1))
@@ -185,7 +185,9 @@ lemma lc_para_refl : ∀ t, lc t → para t t := by
   case lc_app u1 u2 _ _ h h' =>
     exact (para_app u1 u1 u2 u2 h h')
 
-lemma para_subst_all t1 t2 s1 s2 : (para t1 t2) → (para s1 s2) → ∀ x, (para ([x // s1] t1) ([x // s2] t2)) := by
+lemma para_subst_all t1 t2 s1 s2 :
+    (para t1 t2) → (para s1 s2)
+    → ∀ x, (para ([x // s1] t1) ([x // s2] t2)) := by
   intro t1pt2 s1ps2 x
   induction t1pt2
   case para_var y =>
@@ -203,17 +205,17 @@ lemma para_subst_all t1 t2 s1 s2 : (para t1 t2) → (para s1 s2) → ∀ x, (par
     simp at hy
     push_neg at hy
     have p : x ≠ y := (fun q => (hy.2 q.symm))
-    rw [subst_open_var u1 s1 (para_regular _ _ s1ps2).1 x y p] 
+    rw [subst_open_var u1 s1 (para_regular _ _ s1ps2).1 x y p]
     rw [subst_open_var u1' s2 (para_regular _ _ s1ps2).2 x y p]
     exact (g y hy.1)
-    exact h     
+    exact h
   case para_app u1 u1' u2 u2' u1pu1' u2pu2' f g =>
     simp only [subst]
     apply para_app
     exact f
     exact g
   case para_abs u1 u1' L f g =>
-    simp only [subst] at g ⊢ 
+    simp only [subst] at g ⊢
     apply para_abs _ _ (L ∪ {x})
     intro y hy
     simp at hy
@@ -224,12 +226,11 @@ lemma para_subst_all t1 t2 s1 s2 : (para t1 t2) → (para s1 s2) → ∀ x, (par
     exact (para_regular _ _ s1ps2).2
     exact (para_regular _ _ s1ps2).1
 
-lemma para_open_out t t' u u' (L : Finset ℕ) : 
-    (∀ x, x ∉ L → para (open₀ t ($ x)) (open₀ u ($ x))) →
-    para t' u' → para (open₀ t t') (open₀ u u') := by
+lemma para_open_out t t' u u' (L : Finset ℕ) :
+    (∀ x, x ∉ L → para (open₀ t ($ x)) (open₀ u ($ x)))
+    → para t' u' → para (open₀ t t') (open₀ u u') := by
   intro f tpu'
-  have q := pick_fresh t (L ∪ (fv u))
-  rcases q with ⟨x, qx⟩
+  let ⟨x, qx⟩ := pick_fresh t (L ∪ (fv u))
   simp at qx
   push_neg at qx
   rw [subst_intro t t' (para_regular _ _ tpu').1 x qx.2.2]
@@ -238,9 +239,10 @@ lemma para_open_out t t' u u' (L : Finset ℕ) :
   exact (f x qx.1)
   exact tpu'
 
-lemma opening_closing_para t u x y z : 
-    para t u → y ∉ ((fv t) ∪ (fv u) ∪ {x}) → 
-    para (opening z ($ y) (closing z x t)) (opening z ($ y) (closing z x u)) := by
+lemma opening_closing_para t u x y z :
+    para t u → y ∉ ((fv t) ∪ (fv u) ∪ {x})
+    → para (opening z ($ y) (closing z x t))
+           (opening z ($ y) (closing z x u)) := by
   intro tpu hy
   simp at hy
   push_neg at hy
@@ -248,19 +250,19 @@ lemma opening_closing_para t u x y z :
   rw [open_close_subst u x y (para_regular _ _ tpu).2 z]
   apply para_subst_all _ _ _ _ tpu (para_var y)
 
-lemma open_close_para t u x y : 
-    para t u → y ∉ ((fv t) ∪ (fv u) ∪ {x}) → 
-    para (open₀ (close₀ t x) ($ y)) (open₀ (close₀ u x) ($ y)) := opening_closing_para t u x y 0
+lemma open_close_para t u x y :
+    para t u → y ∉ ((fv t) ∪ (fv u) ∪ {x})
+    → para (open₀ (close₀ t x) ($ y))
+           (open₀ (close₀ u x) ($ y)) := opening_closing_para t u x y 0
 
-lemma para_through t1 t2 u1 u2 x : 
-    (x ∉ fv t1 ∧ x ∉ fv t2) → 
-    (para (open₀ t1 ($ x)) (open₀ t2 ($ x))) → 
-    (para u1 u2) → 
-    (para (open₀ t1 u1) (open₀ t2 u2)) := by
-  rintro ⟨h1, h2⟩ f g 
+lemma para_through t1 t2 u1 u2 x :
+    (x ∉ fv t1 ∧ x ∉ fv t2)
+    → (para (open₀ t1 ($ x)) (open₀ t2 ($ x)))
+    → (para u1 u2) → (para (open₀ t1 u1) (open₀ t2 u2)) := by
+  rintro ⟨h1, h2⟩ f g
   rw [subst_intro t1 u1 (para_regular _ _ g).1 x h1]
   rw [subst_intro t2 u2 (para_regular _ _ g).2 x h2]
-  apply para_subst_all 
+  apply para_subst_all
   exact f
   exact g
 
@@ -272,7 +274,8 @@ inductive multi_red : Trm → Trm → Prop
 
 open multi_red
 
-lemma multi_red_trans t1 t2 t3 : (multi_red t1 t2) → (multi_red t2 t3) → (multi_red t1 t3) := by
+lemma multi_red_trans t1 t2 t3 :
+    (multi_red t1 t2) → (multi_red t2 t3) → (multi_red t1 t3) := by
   intro t1mlt2 t2mlt3
   induction t2mlt3
   case mr_refl _ =>
@@ -282,23 +285,28 @@ lemma multi_red_trans t1 t2 t3 : (multi_red t1 t2) → (multi_red t2 t3) → (mu
     . exact f
     . exact s2bs3
 
-lemma multi_red_regular : ∀ t1 t2, (multi_red t1 t2) → (lc t1) ∧ (lc t2) := by
+lemma multi_red_regular :
+    ∀ t1 t2, (multi_red t1 t2) → (lc t1) ∧ (lc t2) := by
   intro t1 t2 t1mt2
   induction t1mt2
   case mr_refl s =>
-    exact ⟨s, s⟩ 
+    exact ⟨s, s⟩
   case mr_head s1 s2 _ s2bs3 h =>
     exact ⟨h.1, (beta_red_regular s1 s2 s2bs3).2⟩
 
-lemma beta_to_multi_red : ∀ t1 t2, (beta_red t1 t2) → (multi_red t1 t2) := by
+lemma beta_to_multi_red :
+    ∀ t1 t2, (beta_red t1 t2) → (multi_red t1 t2) := by
   intro t1 t2 t1rt2
   apply (mr_head t1 t1 t2)
   apply (mr_refl t1)
   exact (beta_red_regular t1 t2 t1rt2).1
   exact t1rt2
 
-lemma multi_red_abs_intro' u1 u2 x : multi_red u1 u2 → (∀ t1 t2, u1 = open₀ t1 ($ x) → u2 = open₀ t2 ($ x) → x ∉ fv t1 → x ∉ fv t2 → multi_red (λ t1) (λ t2)) := by  
-  intro u1mu2 
+lemma multi_red_abs_intro' u1 u2 x :
+    multi_red u1 u2
+    → (∀ t1 t2, u1 = open₀ t1 ($ x) → u2 = open₀ t2 ($ x)
+       → x ∉ fv t1 → x ∉ fv t2 → multi_red (λ t1) (λ t2)) := by
+  intro u1mu2
   induction u1mu2
   case mr_refl t =>
     intro t1 t2 p1 p2 fx1 fx2
@@ -306,7 +314,7 @@ lemma multi_red_abs_intro' u1 u2 x : multi_red u1 u2 → (∀ t1 t2, u1 = open�
     have q := open₀_injective _ _ _ fx1 fx2 p2
     rw [q]
     apply mr_refl
-    apply lc_abs t2 ∅ 
+    apply lc_abs t2 ∅
     intro z _
     rw [subst_intro t2 ($ z) (lc_var z) x fx2]
     apply subst_lc
@@ -328,7 +336,9 @@ lemma multi_red_abs_intro' u1 u2 x : multi_red u1 u2 → (∀ t1 t2, u1 = open�
     simp [close₀, close_var_fv s1 x 0]
     exact fx2
 
-lemma multi_red_abs_intro t1 t2 x : multi_red (open₀ t1 ($ x)) (open₀ t2 ($ x)) → x ∉ fv t1 → x ∉ fv t2 → multi_red (λ t1) (λ t2) := by  
+lemma multi_red_abs_intro t1 t2 x :
+    multi_red (open₀ t1 ($ x)) (open₀ t2 ($ x))
+    → x ∉ fv t1 → x ∉ fv t2 → multi_red (λ t1) (λ t2) := by
   intro R hx1 hx2
   apply (multi_red_abs_intro' (open₀ t1 ($ x)) (open₀ t2 ($ x)) x)
   exact R
@@ -337,10 +347,11 @@ lemma multi_red_abs_intro t1 t2 x : multi_red (open₀ t1 ($ x)) (open₀ t2 ($ 
   exact hx1
   exact hx2
 
-lemma multi_red_abs t1 t2 (L : Finset ℕ): (∀ x, x ∉ L → multi_red (open₀ t1 ($ x)) (open₀ t2 ($ x))) → multi_red (λ t1) (λ t2) := by
+lemma multi_red_abs t1 t2 (L : Finset ℕ):
+    (∀ x, x ∉ L → multi_red (open₀ t1 ($ x)) (open₀ t2 ($ x)))
+    → multi_red (λ t1) (λ t2) := by
   intro f
-  have w := pick_fresh t2 (L ∪ (fv t1))
-  rcases w with ⟨x, hx⟩ 
+  let ⟨x, hx⟩ := pick_fresh t2 (L ∪ (fv t1))
   simp at hx
   push_neg at hx
   apply (multi_red_abs_intro t1 t2 x)
@@ -348,7 +359,9 @@ lemma multi_red_abs t1 t2 (L : Finset ℕ): (∀ x, x ∉ L → multi_red (open�
   exact hx.2.1
   exact hx.2.2
 
-lemma multi_red_app1 t1 t1' t2 : (multi_red t1 t1') ∧ (lc t2) → (multi_red (app t1 t2) (app t1' t2)) := by
+lemma multi_red_app1 t1 t1' t2 :
+    (multi_red t1 t1') ∧ (lc t2)
+    → (multi_red (app t1 t2) (app t1' t2)) := by
   rintro ⟨t1mt2, lct2⟩
   induction t1mt2
   case mr_refl t =>
@@ -363,7 +376,9 @@ lemma multi_red_app1 t1 t1' t2 : (multi_red t1 t1') ∧ (lc t2) → (multi_red (
     exact lct2
     exact s1bs2
 
-lemma multi_red_app2 t1 t2 t2' : (multi_red t2 t2') ∧ (lc t1) → (multi_red (app t1 t2) (app t1 t2')) := by
+lemma multi_red_app2 t1 t2 t2' :
+    (multi_red t2 t2') ∧ (lc t1)
+    → (multi_red (app t1 t2) (app t1 t2')) := by
   rintro ⟨t1mt2, lct1⟩
   induction t1mt2
   case mr_refl t =>
@@ -378,7 +393,9 @@ lemma multi_red_app2 t1 t2 t2' : (multi_red t2 t2') ∧ (lc t1) → (multi_red (
     exact lct1
     exact s1bs2
 
-lemma multi_red_subst_in t x u1 u2 : (multi_red u1 u2) ∧ (lc t) → (multi_red ([x // u1] t) ([x // u2] t)) := by
+lemma multi_red_subst_in t x u1 u2 :
+    (multi_red u1 u2) ∧ (lc t)
+    → (multi_red ([x // u1] t) ([x // u2] t)) := by
   rintro ⟨u1mu2, lct⟩
   induction lct
   case lc_var i =>
@@ -413,29 +430,31 @@ lemma multi_red_subst_in t x u1 u2 : (multi_red u1 u2) ∧ (lc t) → (multi_red
     . apply h2
     . apply subst_lc
       apply lc1
-      apply (multi_red_regular _ _ u1mu2).2 
+      apply (multi_red_regular _ _ u1mu2).2
 
-lemma multi_red_subst_all t1 t2 x u1 u2 : (multi_red t1 t2) ∧ (multi_red u1 u2) → (multi_red ([x // u1] t1) ([x // u2] t2)) := by
+lemma multi_red_subst_all t1 t2 x u1 u2 :
+    (multi_red t1 t2) ∧ (multi_red u1 u2)
+    → (multi_red ([x // u1] t1) ([x // u2] t2)) := by
   rintro ⟨t1mt2, u1mu2⟩
   induction t1mt2
   case mr_refl lct =>
-    apply multi_red_subst_in 
+    apply multi_red_subst_in
     exact ⟨u1mu2, lct⟩
   case mr_head s1 s2 _ s1bs2 f =>
      apply mr_head _ ([x // u2] s1) _
      exact f
      apply beta_red_subst_out
      exact ⟨s1bs2, (multi_red_regular _ _ u1mu2).2⟩
-      
-lemma multi_red_through t1 t2 u1 u2 x : 
-    (x ∉ fv t1 ∧ x ∉ fv t2) → 
-    (multi_red (open₀ t1 ($ x)) (open₀ t2 ($ x))) → 
-    (multi_red u1 u2) → 
+
+lemma multi_red_through t1 t2 u1 u2 x :
+    (x ∉ fv t1 ∧ x ∉ fv t2) →
+    (multi_red (open₀ t1 ($ x)) (open₀ t2 ($ x))) →
+    (multi_red u1 u2) →
     (multi_red (open₀ t1 u1) (open₀ t2 u2)) := by
-  rintro ⟨h1, h2⟩ f g 
+  rintro ⟨h1, h2⟩ f g
   rw [subst_intro t1 u1 (multi_red_regular _ _ g).1 x h1]
   rw [subst_intro t2 u2 (multi_red_regular _ _ g).2 x h2]
-  apply multi_red_subst_all 
+  apply multi_red_subst_all
   exact ⟨f, g⟩
 
 ------------------------
@@ -447,7 +466,8 @@ inductive multi_para : Trm → Trm → Prop
 
 open multi_para
 
-lemma multi_para_trans : ∀ t1 t2 t3, (multi_para t1 t2) → (multi_para t2 t3) → (multi_para t1 t3) := by
+lemma multi_para_trans : ∀ t1 t2 t3,
+    (multi_para t1 t2) → (multi_para t2 t3) → (multi_para t1 t3) := by
   intro t1 t2 t3 t1mpt2 t2mpt3
   induction t2mpt3
   case m_para_refl _ =>
@@ -463,7 +483,7 @@ lemma multi_para_regular : ∀ t1 t2, (multi_para t1 t2) → (lc t1) ∧ (lc t2)
   case m_para_refl lct =>
     exact ⟨lct, lct⟩
   case m_para_head s1 s2 _ s1ps2 h =>
-    exact ⟨h.1, (para_regular s1 s2 s1ps2).2⟩ 
+    exact ⟨h.1, (para_regular s1 s2 s1ps2).2⟩
 
 lemma para_to_multi_para : ∀ t1 t2, (para t1 t2) → (multi_para t1 t2) := by
   intro t1 t2 t1pt2
@@ -477,7 +497,7 @@ lemma para_to_multi_para : ∀ t1 t2, (para t1 t2) → (multi_para t1 t2) := by
       apply lc_abs s1 L
       exact (fun x hx => (para_regular _ _ (f x hx)).1)
       exact (multi_para_regular _ _ b).1
-    . apply (para_red s1 s1' s2 s2' L f s2ps2')    
+    . apply (para_red s1 s1' s2 s2' L f s2ps2')
   case para_app s1 s1' s2 s2' s1ps1' s2ps2' _ _ =>
     apply m_para_head _ (s1 @ s2)
     . apply m_para_refl
@@ -508,7 +528,7 @@ lemma beta_red_to_para : ∀ t t', beta_red t t' → para t t' := by
   case br_app1 t1 t1' t2 lct2 _ h =>
     apply (para_app t1 t1' t2 t2)
     exact h
-    exact (lc_para_refl _ lct2)    
+    exact (lc_para_refl _ lct2)
   case br_app2 t1 t2 t2' lct1 _ h =>
     apply (para_app t1 t1 t2 t2')
     exact (lc_para_refl _ lct1)
@@ -520,7 +540,7 @@ lemma beta_red_to_para : ∀ t t', beta_red t t' → para t t' := by
 lemma multi_red_to_para : ∀ t t', multi_red t t' → multi_para t t' := by
   intro t t' tmrt'
   induction tmrt'
-  case mr_refl lct => 
+  case mr_refl lct =>
     exact (m_para_refl t lct)
   case mr_head t1 t2 _ t1rt2 t2pt3 =>
     apply m_para_head
@@ -530,7 +550,7 @@ lemma multi_red_to_para : ∀ t t', multi_red t t' → multi_para t t' := by
 lemma para_to_multi_red : ∀ t t', para t t' → multi_red t t' := by
   intro t t' tpt'
   induction tpt'
-  case para_var x => 
+  case para_var x =>
     exact (mr_refl ($ x) (lc_var x))
   case para_red t1 t1' t2 t2' L f t2pt2' h h' =>
     apply (multi_red_trans ((abs t1) @ t2) (open₀ t1 t2) (open₀ t1' t2'))
@@ -549,7 +569,7 @@ lemma para_to_multi_red : ∀ t t', para t t' → multi_red t t' := by
       push_neg at hx
       apply (multi_red_through t1 t1' t2 t2' x)
       constructor
-      .  exact (hx.2).1      
+      .  exact (hx.2).1
       .  exact (hx.2).2
       apply (h x (hx.1))
       exact h'
@@ -558,16 +578,16 @@ lemma para_to_multi_red : ∀ t t', para t t' → multi_red t t' := by
     . apply (multi_red_app1 t1 t1' t2)
       exact ⟨h1 , (para_regular t2 t2' t2pt2').1⟩
     . apply (multi_red_app2 t1' t2 t2')
-      exact ⟨h2 , (para_regular t1 t1' t1pt1').2⟩ 
+      exact ⟨h2 , (para_regular t1 t1' t1pt1').2⟩
   case para_abs t1 t1' L _ h =>
     apply (multi_red_abs t1 t1' L h)
- 
+
 lemma multi_para_to_multi_red : ∀ t t', multi_para t t' → multi_red t t' := by
   intro t t' tmpt'
   induction tmpt'
   case m_para_refl lct =>
     exact (mr_refl t lct)
-  case m_para_head t1 t2 _ t1pt2 t1mlt2 => 
+  case m_para_head t1 t2 _ t1pt2 t1mlt2 =>
     apply (multi_red_trans t t1 t2)
     exact t1mlt2
     exact (para_to_multi_red t1 t2 t1pt2)
