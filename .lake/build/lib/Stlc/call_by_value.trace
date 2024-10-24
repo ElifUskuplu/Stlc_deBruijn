@@ -1,0 +1,5 @@
+{"log":
+ [{"message":
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/packages/checkdecls/.lake/build/lib:././.lake/packages/MD4Lean/.lake/build/lib:././.lake/packages/UnicodeBasic/.lake/build/lib:././.lake/packages/BibtexQuery/.lake/build/lib:././.lake/packages/doc-gen4/.lake/build/lib:././.lake/build/lib LD_LIBRARY_PATH= /home/elifuskuplu/.elan/toolchains/leanprover--lean4---v4.13.0-rc3/bin/lean ././././Stlc/call_by_value.lean -R ./././. -o ././.lake/build/lib/Stlc/call_by_value.olean -i ././.lake/build/lib/Stlc/call_by_value.ilean -c ././.lake/build/ir/Stlc/call_by_value.c --json",
+   "level": "trace"}],
+ "depHash": "9677836804811044125"}
