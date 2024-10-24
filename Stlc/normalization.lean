@@ -65,7 +65,8 @@ lemma strongly_normalizable_iff_SN t :
     . intro n
       have rel := w (f' n).1 (f' n).2
       have eq1 : ((f' n).1) = (f'' n) := by simp
-      have eq2 : (f (f' n).1 (f' n).2) = (f'' (Nat.succ n)) := by simp [Function.iterate_succ_apply']
+      have eq2 : (f (f' n).1 (f' n).2) = (f'' (n + 1)) := by
+        simp [f'', f', Function.iterate_succ_apply']
       simp [← eq1, ← eq2, rel]
   . intro snt
     induction snt
@@ -206,7 +207,6 @@ theorem CR_1_3 : ∀ A t,
           have this2 : a ∈ SC (A1 -> A2) := (F a tba)
           apply (this2.2 u' Hu)
         next c lct ubc =>
-          simp only
           apply ihu c ubc
           constructor
           . apply (beta_red_regular _ _ ubc).2
@@ -276,7 +276,6 @@ theorem SC_lambda A1 A2 t : lc (λ t)
           next t'' L a =>
             let ⟨x, hx⟩ := pick_fresh t (L ∪ (fv t''))
             simp at hx
-            push_neg at hx
             have this3 : beta_red (open₀ t ($ y))  (open₀ t'' ($ y)) := by
               rw [subst_intro t ($ y) (lc_var y) x hx.2.2]
               rw [subst_intro t'' ($ y) (lc_var y) x hx.2.1]
@@ -342,7 +341,6 @@ lemma SC_subst t A : typing Γ t A
     intros u1 scu1
     let ⟨x, hx⟩ := pick_fresh u L
     simp at hx
-    push_neg at hx
     have this : (∀ y (s : y ∈ (context_terms ((x, T1) :: Δ))),
         ((add_term Δ f u1 x T1) ⟨y, s⟩) ∈ SC (context_type ((x, T1) :: Δ) ⟨y, s⟩)) := by
       intro y s
