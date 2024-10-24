@@ -1,1 +1,9 @@
-def hello := "world"
+import Stlc.basics
+import Stlc.call_by_value
+import Stlc.confluence
+import Stlc.context
+import Stlc.multi_subst
+import Stlc.normalization
+import Stlc.open_close
+import Stlc.reductions
+import Stlc.typing
