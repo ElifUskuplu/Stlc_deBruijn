@@ -60,5 +60,4 @@ lemma subst_fresh (t s : Trm) (y : ℕ) (h : y ∉ (fv t)) : ([y // s] t) = t :=
   case app u1 u2 h1 h2 =>
     simp only [subst, app.injEq]
     simp [fv] at h
-    push_neg at h
     exact ⟨(h1 h.1), (h2 h.2)⟩

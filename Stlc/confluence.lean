@@ -29,7 +29,6 @@ lemma para_diamond t t1 :
     case para_red u1' u2' L' f' s2pu2' =>
       let ⟨x, qx⟩ := pick_fresh u2' (L ∪ L' ∪ (fv u1') ∪ (fv s1') ∪ (fv s2'))
       simp at qx
-      push_neg at qx
       rw [subst_intro u1' u2' (para_regular _ _ s2pu2').2 x qx.2.2.1]
       rw [subst_intro s1' s2' (para_regular _ _ s2ps2').2 x qx.2.2.2.1]
       have fact1: ∃ t', para s2' t' ∧ para u2' t' := by
@@ -47,7 +46,6 @@ lemma para_diamond t t1 :
       next s1'' L' f' =>
         let ⟨x, qx⟩ := pick_fresh s1' (L ∪ L' ∪ (fv s1''))
         simp at qx
-        push_neg at qx
         have fact1: ∃ t', para s2' t' ∧ para u2' t' := by
           apply ih2 _ s2pu2'
         have fact2 : ∃ t', para (open₀ s1' ($ x)) t' ∧ para (open₀ s1'' ($ x)) t' := by
@@ -73,7 +71,6 @@ lemma para_diamond t t1 :
         next s1'' L' f' =>
           let ⟨x, qx⟩ := pick_fresh u1' (L ∪ L' ∪ (fv s1''))
           simp at qx
-          push_neg at qx
           have fact1: ∃ t', para s2' t' ∧ para u2' t' := by
             apply ih2 _ s2pu2'
           have fact2 : ∃ t', para (λ s1'') t' ∧ para (λ u1') t' := by
@@ -105,7 +102,6 @@ lemma para_diamond t t1 :
     next t2' L' f' =>
       let ⟨x, qx⟩ := pick_fresh s2' (L ∪ L' ∪ (fv t2'))
       simp at qx
-      push_neg at qx
       have fact1 := ih x qx.1 _ (f' x qx.2.1)
       rcases fact1 with ⟨t', qt'⟩
       use (λ (close₀ t' x))

@@ -99,7 +99,6 @@ lemma multi_subst_fresh Γ t u y T (h : y ∉ (fv t)) (f : context_terms Γ → 
   case app u1 u2 h1 h2 =>
     simp only [multi_subst, app.injEq]
     simp [fv] at h
-    push_neg at h
     exact ⟨(h1 h.1), (h2 h.2)⟩
 
 
@@ -113,10 +112,8 @@ lemma multi_subst_open_lemma_1 e1 e2 Γ : (f : context_terms Γ → Trm)
     simp
     intros f _ j
     by_cases hjy : (j = y)
-    . simp [opening]
-      rw [if_pos, if_pos] <;> exact hjy
-    . simp [opening]
-      rw [if_neg, if_neg, multi_subst]
+    . rw [if_pos, if_pos] <;> exact hjy
+    . rw [if_neg, if_neg, multi_subst]
       <;> exact hjy
   case fvar y =>
    intro f lcf j
@@ -203,7 +200,6 @@ lemma multi_subst_lc t Γ : lc t
     apply lc_abs _ (L ∪ (context_terms Γ) ∪ (fv u))
     intro x hx
     simp at hx
-    push_neg at hx
     rw [← multi_subst_open Γ u x hx.2.1 f lcf]
     apply hu x hx.1
   case lc_app u1 u2 lcu1 lcu2 hu1 hu2 =>

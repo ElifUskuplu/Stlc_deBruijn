@@ -28,7 +28,6 @@ lemma typing_valid_ctx  Γ e T : typing Γ e T → valid_ctx Γ := by
   case typ_abs L φ t T1 _ _ f =>
     let ⟨p1, p2⟩ := pick_fresh t L
     simp at p2
-    push_neg at p2
     apply valid_remove_cons
     apply (f p1 p2.1)
   case typ_app _ _ _ _ _ _ _ h1 _ =>
@@ -53,7 +52,6 @@ lemma typing_weakening_strengthened' (Γ Δ Ψ' : context) (t : Trm) (T : Typ) :
     apply typ_abs (L ∪ context_terms (φ ++ Δ ++ Γ))
     intro x hx
     simp at hx
-    push_neg at hx
     apply (fT2 x hx.1 ((x,T1) :: φ))
     simp [p]
     apply valid_cons
@@ -241,7 +239,6 @@ lemma typing_abs_intro Γ x t T1 T2 :
   apply typ_abs (fv t ∪ context_terms Γ)
   intro y hy
   simp at hy
-  push_neg at hy
   apply (typing_rename _ _ _ _ _ _ hx fx)
   exact hy.1
   exact (fun q => hy.2 ((context_terms_iff_in_list _ _).mpr q))
@@ -259,11 +256,9 @@ lemma preservation_beta_red E e T :
     intro e' p
     cases p
     next t1' L' a' =>
-      simp only
       apply typ_abs (L' ∪ L)
       intro x hx
       simp at hx
-      push_neg at hx
       apply (a_ih x hx.2 (open₀ t1' ($ x)))
       apply (a' x hx.1)
   case typ_app φ t1 t2 S1 S2 f1 f2 h1 h2 =>
@@ -272,12 +267,10 @@ lemma preservation_beta_red E e T :
     next e1 lce1 g =>
       cases f1
       next L h =>
-        simp only
         let ⟨x, hx⟩ := pick_fresh e1 L
         have q : lc t2 := by
           apply (typing_regular _ _ _ f2)
         simp at hx
-        push_neg at hx
         rw [subst_intro e1 t2 q x hx.2]
         apply (typing_subst)
         exact (h x hx.1)

@@ -232,7 +232,6 @@ lemma para_open_out t t' u u' (L : Finset ℕ) :
   intro f tpu'
   let ⟨x, qx⟩ := pick_fresh t (L ∪ (fv u))
   simp at qx
-  push_neg at qx
   rw [subst_intro t t' (para_regular _ _ tpu').1 x qx.2.2]
   rw [subst_intro u u' (para_regular _ _ tpu').2 x qx.2.1]
   apply para_subst_all
@@ -353,7 +352,6 @@ lemma multi_red_abs t1 t2 (L : Finset ℕ):
   intro f
   let ⟨x, hx⟩ := pick_fresh t2 (L ∪ (fv t1))
   simp at hx
-  push_neg at hx
   apply (multi_red_abs_intro t1 t2 x)
   apply (f x hx.1)
   exact hx.2.1
@@ -566,7 +564,6 @@ lemma para_to_multi_red : ∀ t t', para t t' → multi_red t t' := by
     . have  ⟨x, hx⟩ : ∃ x : ℕ, x ∉ (L ∪ (fv t1) ∪ (fv t1')) := by
         exact Infinite.exists_not_mem_finset (L ∪ (fv t1) ∪ (fv t1'))
       simp at hx
-      push_neg at hx
       apply (multi_red_through t1 t1' t2 t2' x)
       constructor
       .  exact (hx.2).1

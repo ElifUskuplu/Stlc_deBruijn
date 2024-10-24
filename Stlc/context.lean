@@ -145,8 +145,7 @@ lemma binds_head (x : ℕ) (T : Typ) (Γ Δ : context) :
     binds x T Γ → binds x T (Γ ++ Δ) := by
   induction Γ
   case nil =>
-    simp only [binds, _root_.get]
-    exact fun a => False.elim a
+    simp
   case cons b Γ' f =>
     simp only [binds, _root_.get, append_eq]
     by_cases hxb : x = b.1
@@ -165,9 +164,7 @@ lemma binds_concat_inv' (x : ℕ) (T : Typ) (Γ Δ : context) :
     → (binds x T Γ) := by
   induction Γ
   case nil =>
-    simp only [binds, nil_append, _root_.get, in_context]
-    simp only [false_or]
-    exact (fun p f => f p)
+    simp
   case cons b Γ' f =>
     intro bxT h
     rcases h with h1 | h2
@@ -263,7 +260,7 @@ lemma binds_in_context (x : ℕ) (T : Typ) (Γ : context) :
     binds x T Γ → in_context x Γ := by
   induction Γ
   case nil =>
-    simp only [binds, _root_.get, in_context, IsEmpty.forall_iff]
+    simp
   case cons b Γ' f =>
     simp only [binds, _root_.get, in_context] at f ⊢
     by_cases hxb : x = b.1

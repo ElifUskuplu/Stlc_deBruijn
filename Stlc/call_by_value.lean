@@ -71,12 +71,10 @@ lemma preservation E e T : typing E e T → ((e' : Trm) →  eval e e' → typin
     next e1 lce1 g =>
       cases f1
       next L h =>
-        simp only
         let ⟨x, hx⟩ := pick_fresh e1 L
         have q : lc t2 := by
           apply (typing_regular _ _ _ f2)
         simp at hx
-        push_neg at hx
         rw [subst_intro e1 t2 q x hx.2]
         apply (typing_subst)
         exact (h x hx.1)

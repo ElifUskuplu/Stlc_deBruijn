@@ -134,7 +134,6 @@ lemma lc_abs_iff_body : ∀ t, lc (abs t) ↔ body t := by
     cases h
     next L a =>
       use L
-      exact a
   . rintro ⟨L, h⟩
     exact (lc_abs t L h)
 ----------------------------------------------------------------------
@@ -166,7 +165,6 @@ lemma close_open (x : ℕ) (t : Trm) :
   case app u1 u2 hu1 hu2 =>
     simp [opening, closing]
     simp [fv] at hx
-    push_neg at hx
     exact (fun p => ⟨hu1 hx.1 p, hu2 hx.2 p⟩)
 
 --special case of close_open at j=0
@@ -205,13 +203,15 @@ lemma open_close_lemma (x y z : ℕ) (t : Trm) : x ≠ y → y ∉ fv t
         simp only [opening]
       . rw [if_neg hja]
         simp only [opening, ite_eq_right_iff]
-        exact hia
+        intro ia
+        simp
+        exact (hia ia)
   case fvar a =>
     intro i j _
     simp only [closing]
     by_cases hxa : x = a
     . rw [if_pos hxa]
-      simp only [opening, ite_true, opening._eq_2]
+      simp only [opening, ite_true]
     . rw [if_neg hxa]
       simp only [opening]
   case abs u hu =>
@@ -224,7 +224,6 @@ lemma open_close_lemma (x y z : ℕ) (t : Trm) : x ≠ y → y ∉ fv t
     intro i j neqij
     simp only [opening, app.injEq]
     simp [fv] at hy
-    push_neg at hy
     exact ⟨hu1 hy.1 i j neqij, hu2 hy.2 i j neqij⟩
 
 lemma open_close (x : ℕ) (t : Trm) :
@@ -246,7 +245,6 @@ lemma open_close (x : ℕ) (t : Trm) :
     simp [closing, opening]
     let ⟨y, hy⟩ := pick_fresh u (L ∪ (fv ($ x)) ∪ (fv (( {j + 1 ~> $ x} { j + 1 <~ x } u))))
     simp at hy
-    push_neg at hy
     apply (open₀_injective y ( {j + 1 ~> $ x} { j + 1 <~ x } u)  u (hy.2.2.1) (hy.2.2.2))
     rw [← (hu y (hy.1) (j + 1))]
     simp [open₀]
@@ -410,7 +408,6 @@ lemma open_body : ∀ t u, body t → lc u → lc (open₀ t u) := by
   have ⟨y, hy⟩ : ∃ y : ℕ, y ∉ (L ∪ (fv t)) := by
       exact Infinite.exists_not_mem_finset (L ∪ (fv t))
   simp at hy
-  push_neg at hy
   rw [subst_intro t u lcu y hy.2]
   exact (subst_lc (open₀ t ($ y)) u y (a y hy.1) lcu)
 
