@@ -9,4 +9,6 @@ The two important parts of the library are:
 
 For the SN proof, we used the techniques in Jeremy Avigad's book, Mathematical Logic and Computation.
 
-Note: This work is a continuation of our project conducted in the Formalization of Mathematics (SLMATH) summer program.
+Note: This work is a continuation of our project conducted in the Formalization of Mathematics (SLMATH) summer program. 
+
+
