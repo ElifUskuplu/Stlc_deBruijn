@@ -64,7 +64,7 @@ lemma strongly_normalizable_iff_SN t :
     . rfl
     . intro n
       have rel := w (f' n).1 (f' n).2
-      have eq1 : ((f' n).1) = (f'' n) := by simp
+      have eq1 : ((f' n).1) = (f'' n) := by rw []
       have eq2 : (f (f' n).1 (f' n).2) = (f'' (n + 1)) := by
         simp [f'', f', Function.iterate_succ_apply']
       simp [← eq1, ← eq2, rel]

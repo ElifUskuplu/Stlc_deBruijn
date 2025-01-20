@@ -35,8 +35,7 @@ lemma in_context_append_neg (a : ℕ) (Γ Δ : context) :
     simp only [in_context, not_false_eq_true, true_and] at H ⊢
     rwa [nil_append] at H
   case cons b Γ' f =>
-    simp only [in_context] at H f ⊢
-    push_neg at H ⊢
+    simp [in_context] at H f ⊢
     exact ⟨⟨H.1, (f (H.2)).1⟩, (f (H.2)).2⟩
 
 lemma in_context_append_neg' (a : ℕ) (Γ Δ : context) :
@@ -47,8 +46,7 @@ lemma in_context_append_neg' (a : ℕ) (Γ Δ : context) :
     simp only [nil_append]
     exact H2
   case cons b Γ' f =>
-    simp only [in_context, append_eq] at H1 ⊢
-    push_neg at H1 ⊢
+    simp [in_context, append_eq] at H1 ⊢
     exact ⟨H1.1, f H1.2⟩
 
 -- We can only bind variable once per context --
@@ -125,7 +123,7 @@ lemma binds_singleton (x : ℕ) (T : Typ) : binds x T [(x, T)] := by
 
 lemma binds_singleton_tail (x : ℕ) (T : Typ) (Γ : context) :
     binds x T ([(x, T)] ++ Γ) := by
-  simp only [binds, _root_.get, append_eq, nil_append, ite_true]
+  simp [binds, _root_.get, append_eq, nil_append, ite_true]
 
 lemma binds_tail (x : ℕ) (T : Typ) (Γ Δ : context) :
     binds x T Γ → (¬ (in_context x Δ)) → binds x T (Δ ++ Γ) := by
@@ -137,7 +135,7 @@ lemma binds_tail (x : ℕ) (T : Typ) (Γ Δ : context) :
   case cons b Δ' f' =>
     simp [in_context] at nx
     push_neg at nx
-    simp only [_root_.get, append_eq]
+    simp [_root_.get, append_eq]
     rw [if_neg nx.1]
     apply (f' nx.2)
 
@@ -149,9 +147,11 @@ lemma binds_head (x : ℕ) (T : Typ) (Γ Δ : context) :
   case cons b Γ' f =>
     simp only [binds, _root_.get, append_eq]
     by_cases hxb : x = b.1
-    . rw [if_pos hxb, if_pos hxb]
+    . simp only [cons_append, _root_.get]
+      rw [if_pos hxb, if_pos hxb]
       exact id
-    . rw [if_neg hxb]
+    . simp only [cons_append, _root_.get]
+      rw [if_neg hxb]
       intro H
       simp [binds] at f
       rw [if_neg hxb]
@@ -289,13 +289,13 @@ lemma binds_concat_ok (x : ℕ) (T : Typ) (Γ Δ : context) :
     next y S H' g =>
       simp only [binds, _root_.get, append_eq] at H' ⊢
       by_cases hxy : x = y
-      . simp only [if_pos hxy]
+      . simp [if_pos hxy]
         by_contra
         apply g
         apply binds_in_context y T (Δ' ++ Γ)
         rw [← hxy]
         exact (f p H')
-      . simp only [if_neg hxy]
+      . simp [if_neg hxy]
         exact (f p H')
 
 lemma binds_weaken (x : ℕ) (T : Typ) (Γ Δ Ψ: context) :
@@ -312,9 +312,9 @@ lemma binds_weaken (x : ℕ) (T : Typ) (Γ Δ Ψ: context) :
     next y S H' g =>
       simp only [binds, _root_.get, append_eq, append_assoc, in_context] at f H' p g ⊢
       by_cases hxy : x = y
-      . simp only [if_pos hxy] at p ⊢
+      . simp [if_pos hxy] at p ⊢
         exact p
-      . simp only [if_neg hxy] at p ⊢
+      . simp [if_neg hxy] at p ⊢
         exact (f p H')
 
 lemma binds_weaken_at_head (x : ℕ) (T : Typ) (Γ Δ : context) :

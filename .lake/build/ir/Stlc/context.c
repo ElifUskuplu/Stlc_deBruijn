@@ -26,7 +26,6 @@ lean_object* l_Lean_replaceRef(lean_object*, lean_object*);
 static lean_object* l___aux__Stlc__context______macroRules__termContext__1___closed__2;
 uint8_t l_Lean_Syntax_isOfKind(lean_object*, lean_object*);
 static lean_object* l___aux__Stlc__context______macroRules__termContext__1___closed__8;
-lean_object* l_List_foldrTR___at_Trm_fv___spec__4(lean_object*, lean_object*);
 static lean_object* l___aux__Stlc__context______macroRules__termContext__1___closed__1;
 static lean_object* l___aux__Stlc__context______macroRules__termContext__1___closed__16;
 static lean_object* l___aux__Stlc__context______macroRules__termContext__1___closed__31;
@@ -37,6 +36,7 @@ static lean_object* l___aux__Stlc__context______macroRules__termContext__1___clo
 static lean_object* l___aux__Stlc__context______macroRules__termContext__1___closed__28;
 lean_object* l_Lean_SourceInfo_fromRef(lean_object*, uint8_t);
 LEAN_EXPORT lean_object* l_get___boxed(lean_object*, lean_object*);
+lean_object* l_List_foldrTR___at_Trm_fv___spec__3(lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_termContext;
 static lean_object* l___aux__Stlc__context______macroRules__termContext__1___closed__3;
 static lean_object* l___aux__Stlc__context______macroRules__termContext__1___closed__21;
@@ -714,7 +714,7 @@ x_7 = lean_box(0);
 lean_ctor_set(x_1, 1, x_7);
 lean_ctor_set(x_1, 0, x_6);
 x_8 = l_context__terms(x_5);
-x_9 = l_List_foldrTR___at_Trm_fv___spec__4(x_8, x_1);
+x_9 = l_List_foldrTR___at_Trm_fv___spec__3(x_8, x_1);
 return x_9;
 }
 else
@@ -733,7 +733,7 @@ x_14 = lean_alloc_ctor(1, 2, 0);
 lean_ctor_set(x_14, 0, x_12);
 lean_ctor_set(x_14, 1, x_13);
 x_15 = l_context__terms(x_11);
-x_16 = l_List_foldrTR___at_Trm_fv___spec__4(x_15, x_14);
+x_16 = l_List_foldrTR___at_Trm_fv___spec__3(x_15, x_14);
 return x_16;
 }
 }

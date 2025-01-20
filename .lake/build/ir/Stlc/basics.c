@@ -50,7 +50,6 @@ static lean_object* l_Trm_term_x24_____closed__3;
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term___x2d_x3e____1___closed__12;
 LEAN_EXPORT lean_object* l_Multiset_ndunion___at_Trm_fv___spec__1(lean_object*, lean_object*);
 static lean_object* l___private_Stlc_basics_0__reprTrm____x40_Stlc_basics___hyg_1075____closed__9;
-LEAN_EXPORT lean_object* l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__5(lean_object*, size_t, size_t, lean_object*);
 LEAN_EXPORT lean_object* l_Trm_term___x2d_x3e__;
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term___x2d_x3e____1___closed__4;
 uint8_t l_Lean_Syntax_isOfKind(lean_object*, lean_object*);
@@ -60,15 +59,12 @@ static lean_object* l___private_Stlc_basics_0__reprTyp____x40_Stlc_basics___hyg_
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term_x5b___x2f_x2f___x5d____1___closed__1;
 static lean_object* l_Trm_term_x5b___x2f_x2f___x5d_____closed__12;
 LEAN_EXPORT lean_object* l_Trm___aux__Stlc__basics______unexpand__Trm__app__1(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT lean_object* l_List_foldrTR___at_Trm_fv___spec__4(lean_object*, lean_object*);
 static lean_object* l_Trm___aux__Stlc__basics______unexpand__Typ__typ__arrow__1___closed__1;
-LEAN_EXPORT lean_object* l_List_elem___at_Trm_fv___spec__3___boxed(lean_object*, lean_object*);
 static lean_object* l___private_Stlc_basics_0__reprTyp____x40_Stlc_basics___hyg_250____closed__4;
 LEAN_EXPORT uint8_t l___private_Stlc_basics_0__decEqTrm____x40_Stlc_basics___hyg_423_(lean_object*, lean_object*);
 static lean_object* l_Trm_term_u03bb_____closed__6;
 static lean_object* l_Trm_term___x2d_x3e_____closed__1;
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term_x5b___x2f_x2f___x5d____1___closed__6;
-LEAN_EXPORT lean_object* l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__5___boxed(lean_object*, lean_object*, lean_object*, lean_object*);
 static lean_object* l_Trm_term_x5b___x2f_x2f___x5d_____closed__1;
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term___x2d_x3e____1___closed__2;
 size_t lean_usize_of_nat(lean_object*);
@@ -84,6 +80,7 @@ lean_object* lean_nat_to_int(lean_object*);
 lean_object* l_Lean_Syntax_node6(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
 static lean_object* l_Trm_term___x2d_x3e_____closed__3;
 static lean_object* l_instReprTyp___closed__1;
+LEAN_EXPORT lean_object* l_List_foldrTR___at_Trm_fv___spec__3(lean_object*, lean_object*);
 static lean_object* l___private_Stlc_basics_0__reprTrm____x40_Stlc_basics___hyg_1075____closed__12;
 LEAN_EXPORT lean_object* l___private_Stlc_basics_0__reprTrm____x40_Stlc_basics___hyg_1075_(lean_object*, lean_object*);
 static lean_object* l_Trm_term_x5b___x2f_x2f___x5d_____closed__9;
@@ -93,7 +90,6 @@ LEAN_EXPORT lean_object* l_Trm_term_u03bb__;
 static lean_object* l___private_Stlc_basics_0__reprTyp____x40_Stlc_basics___hyg_250____closed__7;
 static lean_object* l_Trm_term_u03bb_____closed__1;
 LEAN_EXPORT lean_object* l_Trm___aux__Stlc__basics______unexpand__Trm__fvar__1___boxed(lean_object*, lean_object*, lean_object*);
-LEAN_EXPORT uint8_t l_List_elem___at_Trm_fv___spec__3(lean_object*, lean_object*);
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term_x5b___x2f_x2f___x5d____1___closed__7;
 LEAN_EXPORT lean_object* l_Trm___aux__Stlc__basics______unexpand__Typ__typ__arrow__1(lean_object*, lean_object*, lean_object*);
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term_u20ac____1___closed__8;
@@ -101,6 +97,7 @@ static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term_u20ac__
 static lean_object* l_Trm_term_x5b___x2f_x2f___x5d_____closed__8;
 static lean_object* l___private_Stlc_basics_0__reprTyp____x40_Stlc_basics___hyg_250____closed__10;
 lean_object* l_Lean_Syntax_node3(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
+uint8_t l_List_elem___at_Lean_Meta_Occurrences_contains___spec__1(lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_Trm___aux__Stlc__basics______unexpand__Trm__bvar__1(lean_object*, lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l___private_Stlc_basics_0____private_Stlc_basics_0__reprTrm_match__1_splitter____x40_Stlc_basics___hyg_1075____rarg(lean_object*, lean_object*, lean_object*, lean_object*, lean_object*);
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term___x2d_x3e____1___closed__6;
@@ -158,10 +155,12 @@ static lean_object* l_Trm_term_x5b___x2f_x2f___x5d_____closed__6;
 static lean_object* l_Trm_term___x2d_x3e_____closed__2;
 LEAN_EXPORT lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term_x5b___x2f_x2f___x5d____1(lean_object*, lean_object*, lean_object*);
 static lean_object* l_Trm___aux__Stlc__basics______macroRules__Trm__term_x24____1___closed__3;
+LEAN_EXPORT lean_object* l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__4___boxed(lean_object*, lean_object*, lean_object*, lean_object*);
 lean_object* l_Lean_Syntax_node1(lean_object*, lean_object*, lean_object*);
 static lean_object* l_Trm_term_u20ac_____closed__4;
 lean_object* l_Repr_addAppParen(lean_object*, lean_object*);
 LEAN_EXPORT lean_object* l_instReprTrm;
+LEAN_EXPORT lean_object* l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__4(lean_object*, size_t, size_t, lean_object*);
 static lean_object* l_Trm_term_u03bb_____closed__4;
 static lean_object* l___private_Stlc_basics_0__reprTyp____x40_Stlc_basics___hyg_250____closed__1;
 static lean_object* l___private_Stlc_basics_0__reprTyp____x40_Stlc_basics___hyg_250____closed__5;
@@ -3425,40 +3424,11 @@ lean_dec(x_2);
 return x_4;
 }
 }
-LEAN_EXPORT uint8_t l_List_elem___at_Trm_fv___spec__3(lean_object* x_1, lean_object* x_2) {
-_start:
-{
-if (lean_obj_tag(x_2) == 0)
-{
-uint8_t x_3; 
-x_3 = 0;
-return x_3;
-}
-else
-{
-lean_object* x_4; lean_object* x_5; uint8_t x_6; 
-x_4 = lean_ctor_get(x_2, 0);
-x_5 = lean_ctor_get(x_2, 1);
-x_6 = lean_nat_dec_eq(x_1, x_4);
-if (x_6 == 0)
-{
-x_2 = x_5;
-goto _start;
-}
-else
-{
-uint8_t x_8; 
-x_8 = 1;
-return x_8;
-}
-}
-}
-}
 LEAN_EXPORT lean_object* l_List_insert___at_Trm_fv___spec__2(lean_object* x_1, lean_object* x_2) {
 _start:
 {
 uint8_t x_3; 
-x_3 = l_List_elem___at_Trm_fv___spec__3(x_1, x_2);
+x_3 = l_List_elem___at_Lean_Meta_Occurrences_contains___spec__1(x_1, x_2);
 if (x_3 == 0)
 {
 lean_object* x_4; 
@@ -3474,7 +3444,7 @@ return x_2;
 }
 }
 }
-LEAN_EXPORT lean_object* l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__5(lean_object* x_1, size_t x_2, size_t x_3, lean_object* x_4) {
+LEAN_EXPORT lean_object* l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__4(lean_object* x_1, size_t x_2, size_t x_3, lean_object* x_4) {
 _start:
 {
 uint8_t x_5; 
@@ -3496,7 +3466,7 @@ return x_4;
 }
 }
 }
-LEAN_EXPORT lean_object* l_List_foldrTR___at_Trm_fv___spec__4(lean_object* x_1, lean_object* x_2) {
+LEAN_EXPORT lean_object* l_List_foldrTR___at_Trm_fv___spec__3(lean_object* x_1, lean_object* x_2) {
 _start:
 {
 lean_object* x_3; lean_object* x_4; lean_object* x_5; uint8_t x_6; 
@@ -3516,7 +3486,7 @@ size_t x_7; size_t x_8; lean_object* x_9;
 x_7 = lean_usize_of_nat(x_4);
 lean_dec(x_4);
 x_8 = 0;
-x_9 = l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__5(x_3, x_7, x_8, x_1);
+x_9 = l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__4(x_3, x_7, x_8, x_1);
 lean_dec(x_3);
 return x_9;
 }
@@ -3526,7 +3496,7 @@ LEAN_EXPORT lean_object* l_Multiset_ndunion___at_Trm_fv___spec__1(lean_object* x
 _start:
 {
 lean_object* x_3; 
-x_3 = l_List_foldrTR___at_Trm_fv___spec__4(x_2, x_1);
+x_3 = l_List_foldrTR___at_Trm_fv___spec__3(x_2, x_1);
 return x_3;
 }
 }
@@ -3565,24 +3535,13 @@ x_8 = lean_ctor_get(x_1, 0);
 x_9 = lean_ctor_get(x_1, 1);
 x_10 = l_Trm_fv(x_8);
 x_11 = l_Trm_fv(x_9);
-x_12 = l_List_foldrTR___at_Trm_fv___spec__4(x_11, x_10);
+x_12 = l_List_foldrTR___at_Trm_fv___spec__3(x_11, x_10);
 return x_12;
 }
 }
 }
 }
-LEAN_EXPORT lean_object* l_List_elem___at_Trm_fv___spec__3___boxed(lean_object* x_1, lean_object* x_2) {
-_start:
-{
-uint8_t x_3; lean_object* x_4; 
-x_3 = l_List_elem___at_Trm_fv___spec__3(x_1, x_2);
-lean_dec(x_2);
-lean_dec(x_1);
-x_4 = lean_box(x_3);
-return x_4;
-}
-}
-LEAN_EXPORT lean_object* l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__5___boxed(lean_object* x_1, lean_object* x_2, lean_object* x_3, lean_object* x_4) {
+LEAN_EXPORT lean_object* l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__4___boxed(lean_object* x_1, lean_object* x_2, lean_object* x_3, lean_object* x_4) {
 _start:
 {
 size_t x_5; size_t x_6; lean_object* x_7; 
@@ -3590,7 +3549,7 @@ x_5 = lean_unbox_usize(x_2);
 lean_dec(x_2);
 x_6 = lean_unbox_usize(x_3);
 lean_dec(x_3);
-x_7 = l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__5(x_1, x_5, x_6, x_4);
+x_7 = l_Array_foldrMUnsafe_fold___at_Trm_fv___spec__4(x_1, x_5, x_6, x_4);
 lean_dec(x_1);
 return x_7;
 }

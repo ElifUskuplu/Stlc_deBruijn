@@ -191,13 +191,14 @@ lemma open_close_lemma (x y z : ℕ) (t : Trm) : x ≠ y → y ∉ fv t
     intro i j neqij
     simp only [opening]
     by_cases hia : i = a
-    . rw [if_pos hia]
+    . simp only [closing, opening]
+      rw [if_pos hia]
       rw [if_neg]
       simp only [opening, closing]
       rw [if_pos hia, if_neg neqxy, opening]
       exact (fun p => neqij (by rw [← p] at hia; exact hia))
     . rw [if_neg hia]
-      simp only [opening]
+      simp [opening]
       by_cases hja : j = a
       . rw [if_pos hja]
         simp only [opening]
@@ -210,19 +211,22 @@ lemma open_close_lemma (x y z : ℕ) (t : Trm) : x ≠ y → y ∉ fv t
     intro i j _
     simp only [closing]
     by_cases hxa : x = a
-    . rw [if_pos hxa]
+    . simp only [opening, closing]
+      rw [if_pos hxa]
       simp only [opening, ite_true]
-    . rw [if_neg hxa]
+    . simp only [opening, closing]
+      rw [if_neg hxa]
       simp only [opening]
   case abs u hu =>
     simp only [ne_eq, opening, abs.injEq]
     rw [fv] at hy
     intro i j neqij
+    simp only [closing, opening, abs.injEq]
     apply (hu hy (i + 1) (j + 1))
     exact Iff.mpr Nat.succ_ne_succ neqij
   case app u1 u2 hu1 hu2 =>
     intro i j neqij
-    simp only [opening, app.injEq]
+    simp only [closing, opening, app.injEq]
     simp [fv] at hy
     exact ⟨hu1 hy.1 i j neqij, hu2 hy.2 i j neqij⟩
 
@@ -428,7 +432,7 @@ lemma open_close_subst t x y :
     . have hkx : k ≠ x := (fun p => (hxk p.symm))
       simp [if_neg hxk, if_neg hkx]
   case lc_abs s L f h =>
-    simp only [opening, subst, abs.injEq]
+    simp [opening, subst, abs.injEq]
     intro z
     let ⟨w, qw⟩ := pick_fresh s (L ∪ {x} ∪ (fv ( {z + 1 ~> $ y} { z + 1 <~ x } s)) ∪ (fv ([x // $ y] s)))
     simp at qw
@@ -437,7 +441,7 @@ lemma open_close_subst t x y :
     have fact := h w qw.1 (z + 1)
     rw [← subst_open_var _ _ (lc_var y) _ _ hwx, open₀] at fact
     rw [← open_close_lemma _ _ _ _ hwx, ← open₀] at fact
-    apply open₀_injective w _ _
+    apply open₀_injective w _
     exact qw.2.2.1
     exact qw.2.2.2.1
     exact fact
@@ -445,5 +449,5 @@ lemma open_close_subst t x y :
     exact Nat.ne_of_beq_eq_false rfl
   case lc_app u1 u2 _ _ f1 f2 =>
     intro z
-    simp only [opening, subst, app.injEq]
+    simp
     exact ⟨f1 z, f2 z⟩
