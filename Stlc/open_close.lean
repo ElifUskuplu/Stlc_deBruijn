@@ -16,6 +16,13 @@ def opening (x : ℕ) (a : Trm) : Trm → Trm
 
 notation " {" x " ~> " a "} " u => opening x a u
 
+-- Example of opening --
+#eval {0 ~> $2} λ(€0) --does not change since λ.0 is a closed term
+#eval {0 ~> $2} λ(€1) --becomes λ($2)
+#eval {0 ~> $4} λ(λ(€1)) -- does not change since λ.λ.1 is a closed term
+#eval {0 ~> $4} λ(λ(€2)) -- becomes λ(λ($4))
+
+
 --Opening at index zero
 def open₀ u a := opening 0 a u
 
@@ -87,6 +94,11 @@ def closing (k x : ℕ) : Trm → Trm
 
 notation " { " k " <~ " x " } " u => closing k x u
 
+-- Example of closing --
+#eval {0 <~ 2} λ($1) -- does not change since λx.1 does not contain the variable we want to change
+#eval {0 <~ 2} λ($2) --becomes λ(€1), it builds the abstraction λ.λ.1 as expected
+#eval {0 <~ 4} λ(λ($4)) -- becomes λ(λ(€2)), it builds the abstraction λ.λ.λ.2 as expected
+
 --Closing at index zero
 def close₀ u a := closing 0 a u
 
@@ -122,6 +134,25 @@ inductive lc : Trm → Prop
 | lc_app : ∀ u1 u2 : Trm, lc u1 → lc u2 → lc (app u1 u2)
 
 open lc
+
+--As an example, while λ.0 is locally closed, λ.3 is not.
+lemma ex1: (lc (λ (€ 0))) ↔ True := by
+  simp only [iff_true]
+  apply lc_abs (€0) ∅
+  simp [open₀]
+  intro x
+  exact lc_var x
+
+lemma ex2: (lc (λ (€ 3))) ↔ False := by
+  simp only [iff_false]
+  intro u
+  cases u
+  next L a =>
+    have  ⟨x, hx⟩ : ∃ x : ℕ, x ∉ L := by
+      exact Infinite.exists_not_mem_finset L
+    have s := a x hx
+    simp [open₀] at s
+    cases s
 
 /-The predicate “body t” asserts that t describes
 the body of a locally closed abstraction.-/

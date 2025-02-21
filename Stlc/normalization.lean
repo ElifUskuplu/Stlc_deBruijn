@@ -123,9 +123,9 @@ lemma normal_is_unique (t : Trm) :
   rw [normal_has_no_proper_multi_red t1 n1 t3 t1mt3]
   rw [normal_has_no_proper_multi_red t2 n2 t3 t2mt3]
 
--- Definition of strongly computable terms. The difference from Avigad's definition
--- is that the definition is context free. This construction is also known as
--- logical relations. The definition is valid for locally closed terms.
+-- Definition of strongly computable terms by Jeremy Avigad.
+-- This construction is also known as logical relations.
+-- The definition is valid for locally closed terms.
 @[simp]
 def SC : Typ → Set Trm
   | typ_base => {t | (lc t) ∧ SN t}
@@ -166,7 +166,7 @@ theorem CR2 : ∀ A t, (∀ t', t ∈ SC A → multi_red t t' → t' ∈ SC A) :
       apply ih2 (t @ u) (t' @ u) this1 (multi_red_app1 _ _ _ ⟨tmt', H.1⟩)
 
 -- CR1 says that strongly computable terms are strongly normalizing.
--- CR3 says that if a locally closed term t is normal, also any
+-- CR3 says that if a locally closed term t is neutral, also any
 -- one-step reduct of t is strongly computable, then t is strongly computable.
 theorem CR_1_3 : ∀ A t,
     (t ∈ SC A → SN t) ∧ --CR1
@@ -306,7 +306,7 @@ theorem SC_lambda A1 A2 t : lc (λ t)
 -- We can generalize the previous theorem:
 -- Suppose for all strongly computable u, the opened term tᵘ is strongly computable.
 -- Then λt is strongly computable.
-theorem SC_lambda_open A1 A2 t : lc (λ t)
+theorem SC_lambda_term A1 A2 t : lc (λ t)
     → (∀ u, u ∈ SC A1 → (open₀ t u) ∈ SC A2)
     → (λ t) ∈ SC (A1 -> A2) := by
   intro typt F
@@ -334,7 +334,7 @@ lemma SC_subst t A : typing Γ t A
       apply SC_var
   case typ_abs L Δ u T1 T2 a ih =>
     intro f Hf
-    apply SC_lambda_open
+    apply SC_lambda_term
     rw [← multi_subst]
     apply multi_subst_lc _ _ (typing_regular _ _ _ (typ_abs L Δ u T1 T2 a))
     exact (fun x hx => (SC_regular _ _ (Hf x hx)))

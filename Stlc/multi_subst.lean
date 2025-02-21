@@ -22,7 +22,7 @@ def multi_subst (L : Finset ℕ) (f : L → Trm) : Trm → Trm
 | abs u => abs (multi_subst L f u)
 | app u1 u2 => app (multi_subst L f u1) (multi_subst L f u2)
 
--- context_type takes a term in a context and outputs its type
+--context_type takes a term in a context and outputs its type
 @[simp]
 def context_type Γ (x : context_terms Γ) : Typ :=
   match Γ, x with
@@ -33,7 +33,7 @@ def context_type Γ (x : context_terms Γ) : Typ :=
     else
       context_type Γ ⟨x', by simpa [context_terms, ha] using h⟩
 
--- substitution over the empty context does nothing
+--substitution over the empty context does nothing
 lemma multi_subst_over_empty_context t (f : context_terms [] → Trm) :
     (multi_subst (context_terms []) f t) = t := by
   induction t
@@ -48,7 +48,7 @@ lemma multi_subst_over_empty_context t (f : context_terms [] → Trm) :
     simp at ih1 ih2 ⊢
     exact ⟨ih1, ih2⟩
 
--- substitution over [(x,T)] is the same as usual (single) substitution
+--substitution over [(x,T)] is the same as usual (single) substitution
 lemma multi_subst_at_singleton t x T :
     (f : context_terms [(x, T)] → Trm)
     → (multi_subst (context_terms [(x, T)]) f t)
@@ -69,7 +69,7 @@ lemma multi_subst_at_singleton t x T :
     simp
     exact ⟨ih1, ih2⟩
 
--- if we have a function of terms of a context, say f,
+--if we have a function of terms of a context, say f,
 --for a term u and variable x, we can extend the f with mapping x → u
 @[simp]
 def add_term Γ (f : context_terms Γ → Trm)
@@ -130,7 +130,7 @@ lemma multi_subst_open_lemma_1 e1 e2 Γ : (f : context_terms Γ → Trm)
    simp [opening, multi_subst]
    exact ⟨ihu1 f lcf j, ihu2 f lcf j⟩
 
--- special case of previous fact at j=0
+--special case of previous fact at j=0
 lemma multi_subst_open_lemma_2 Γ t u y T : lc u → y ∉ fv t
     → (f : context_terms Γ → Trm)
     → (∀ x (h : x ∈ context_terms Γ), lc (f ⟨x,h⟩))
@@ -180,8 +180,8 @@ lemma context_type_eq_bind Γ (x : context_terms Γ) T :
       symm
       exact p
 
--- if a term is locally closed, and there is list of locally closed terms, then
--- substition with these terms is also locally closed.
+--if a term is locally closed, and there is list of locally closed terms, then
+--substition with these terms is also locally closed.
 lemma multi_subst_lc t Γ : lc t
     → (f : context_terms Γ → Trm)
     → (∀ x (h : x ∈ context_terms Γ), lc (f ⟨x,h⟩))

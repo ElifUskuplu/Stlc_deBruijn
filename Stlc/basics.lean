@@ -23,7 +23,16 @@ notation "$" t => fvar t
 notation "λ" t => abs t
 notation t1 " @ " t2 => app t1 t2
 
--- Defining substitution by induction on terms --
+-- Example of terms --
+-- λ.0 means λx.x in named syntax
+#check λ(€0)
+-- λ.y means λx.y in named syntax (in our case, y:nat again)
+variable (y : ℕ)
+#check λ($ y)
+-- (λ.0)y means we apply variable y to the function λx.x
+#check (λ(€0)) @ ($ y)
+
+-- Defining free variable substitution by induction on terms --
 @[simp]
 def subst (x : ℕ) (a : Trm) : Trm → Trm
 | bvar i => bvar i
@@ -33,7 +42,12 @@ def subst (x : ℕ) (a : Trm) : Trm → Trm
 
 notation  "["x" // " a"] "u => subst x a u
 
--- Free variables --
+-- Example of substitutions --
+#eval [4//($3)] λ($4) --yields λ($3)
+#eval [4//($3)] λ(€0) --yields λ(€0)
+#eval [4//($3)] (λ(€0)) @ ($4) --yields (λ(€0)) @ ($3)
+
+-- Set of free variables --
 def fv : Trm → Finset ℕ
 | bvar _ => {}
 | fvar y => {y}

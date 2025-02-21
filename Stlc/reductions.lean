@@ -19,6 +19,26 @@ inductive beta_red : Trm → Trm → Prop
 
 open beta_red
 
+-- Example of reductions
+--(λ.0)(x) reduces to x for all variable x
+lemma ex1 : (x: ℕ) → (beta_red ((λ (€ 0)) @($ x)) ($ x)) ↔ True := by
+  intro x
+  simp only [iff_true]
+  have p : lc (λ (€0)) := by
+    apply lc_abs (€0) ∅
+    simp [open₀]
+    intro y
+    exact lc_var y
+  apply br_beta (€0) ($ x) p (lc_var x)
+
+--(λ.(λ.0) 0) reduces to λ.0 (namely, (λx.(λy.y)x) reduces to λx.x)
+lemma ex2 : (beta_red (λ ((λ (€ 0)) @ (€ 0))) (λ (€ 0))) ↔ True := by
+  simp only [iff_true]
+  apply br_abs ((λ (€ 0)) @ (€ 0)) (€ 0) ∅
+  intro x
+  simp [open₀]
+  simp [ex1 x]
+
 lemma beta_red_regular : ∀ t1 t2, (beta_red t1 t2) → (lc t1) ∧ (lc t2) := by
   intro t1 t2 t1rt2
   induction t1rt2

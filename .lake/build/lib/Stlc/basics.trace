@@ -1,5 +1,16 @@
 {"log":
  [{"message":
-   ".> LEAN_PATH=././.lake/packages/Cli/.lake/build/lib:././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib LD_LIBRARY_PATH= /home/elifuskuplu/.elan/toolchains/leanprover--lean4---v4.16.0-rc2/bin/lean ././././Stlc/basics.lean -R ./././. -o ././.lake/build/lib/Stlc/basics.olean -i ././.lake/build/lib/Stlc/basics.ilean -c ././.lake/build/ir/Stlc/basics.c --json",
-   "level": "trace"}],
- "depHash": "12323709276709747629"}
+   ".> LEAN_PATH=././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/MD4Lean/.lake/build/lib:././.lake/packages/BibtexQuery/.lake/build/lib:././.lake/packages/UnicodeBasic/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/packages/checkdecls/.lake/build/lib:././.lake/packages/doc-gen4/.lake/build/lib:././.lake/build/lib LD_LIBRARY_PATH=././.lake/build/lib:././.lake/packages/doc-gen4/.lake/build/lib:././.lake/packages/checkdecls/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/packages/Cli/.lake/build/lib:././.lake/packages/UnicodeBasic/.lake/build/lib:././.lake/packages/BibtexQuery/.lake/build/lib:././.lake/packages/MD4Lean/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/batteries/.lake/build/lib:/home/elifuskuplu/.elan/toolchains/leanprover--lean4---v4.16.0-rc2/lib/lean:/home/elifuskuplu/.elan/toolchains/leanprover--lean4---v4.16.0-rc2/lib /home/elifuskuplu/.elan/toolchains/leanprover--lean4---v4.16.0-rc2/bin/lean ././././Stlc/basics.lean -R ./././. -o ././.lake/build/lib/Stlc/basics.olean -i ././.lake/build/lib/Stlc/basics.ilean -c ././.lake/build/ir/Stlc/basics.c --json",
+   "level": "trace"},
+  {"message": "././././Stlc/basics.lean:28:0: λ€0 : Trm", "level": "info"},
+  {"message": "././././Stlc/basics.lean:31:0: λ$y : Trm", "level": "info"},
+  {"message": "././././Stlc/basics.lean:33:0: (λ€0) @ $y : Trm",
+   "level": "info"},
+  {"message": "././././Stlc/basics.lean:46:0: Trm.abs (Trm.fvar 3)",
+   "level": "info"},
+  {"message": "././././Stlc/basics.lean:47:0: Trm.abs (Trm.bvar 0)",
+   "level": "info"},
+  {"message":
+   "././././Stlc/basics.lean:48:0: Trm.app (Trm.abs (Trm.bvar 0)) (Trm.fvar 3)",
+   "level": "info"}],
+ "depHash": "12861274039177556205"}
