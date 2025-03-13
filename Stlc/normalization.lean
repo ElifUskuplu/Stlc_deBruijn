@@ -230,18 +230,6 @@ lemma SC_var A x : ($ x) ∈ SC A := by
     intro t' bred
     cases bred
 
-lemma SC_lambda_lemma A1 A2 t : lc (λ t)
-    → (∀ u x, x ∉ fv t → u ∈ SC A1 → ([x // u] (open₀ t ($ x))) ∈ SC A2)
-    → ∃ y, (open₀ t ($ y)) ∈ SC A2 := by
-  intro _ F
-  let ⟨y, hy⟩ := pick_fresh t ∅
-  simp at hy
-  have this : ($ y) ∈ SC A1 := SC_var A1 y
-  have this2 : (open₀ t ($ y)) ∈ SC A2 := by
-    rw [subst_intro t ($ y) (lc_var y) y hy]
-    exact (F ($ y) y hy this)
-  exact ⟨y, this2⟩
-
 -- Criteria for strongly computable lambda terms:
 -- Suppose for all variable x not occured in t and strongly computable u, we have
 -- [x//u]tˣ is strongly computable. Then λt is strongly computable.
@@ -249,29 +237,36 @@ theorem SC_lambda A1 A2 t : lc (λ t)
     → (∀ u x, x ∉ fv t → u ∈ SC A1 → ([x // u] (open₀ t ($ x))) ∈ SC A2)
     → (λ t) ∈ SC (A1 -> A2) := by
   intro lct F
-  have this := (SC_lambda_lemma _ _ _ lct F)
+  have this : (∃ y, (open₀ t ($ y)) ∈ SC A2) := by
+    let ⟨y, hy⟩ := pick_fresh t ∅
+    simp at hy
+    have this : ($ y) ∈ SC A1 := SC_var A1 y
+    have this2 : (open₀ t ($ y)) ∈ SC A2 := by
+      rw [subst_intro t ($ y) (lc_var y) y hy]
+      exact (F ($ y) y hy this)
+    exact ⟨y, this2⟩
   rcases this with ⟨y, hy⟩
   constructor
   . exact lct
   . intro u Hu
     have snu := CR1 _ _ Hu.2
     have snt := CR1 _ _ hy
-    generalize h : (open₀ t ($ y)) = t' at snt
+    generalize h : (open₀ t ($ y)) = w at snt
     induction snt generalizing t with
     | sn _ iht' =>
       rw [← h] at iht'
       induction snu
-      case sn u' _ ihu' =>
+      case sn u _ ihu =>
         apply CR3 _ _ (lc_app _ _ lct Hu.1) (by simp)
         intro t'' bred
         cases bred
-        next lct' lcu' =>
+        next lct' lcu =>
           let ⟨z, hz⟩ := pick_fresh t {0}
           simp at hz
           push_neg at hz
           rw [subst_intro _ _ Hu.1 z hz.2]
-          apply (F u' z hz.2 Hu.2)
-        next t1' t'bt1' lcu' =>
+          apply (F u z hz.2 Hu.2)
+        next t1' t'bt1' lcu =>
           cases t'bt1'
           next t'' L a =>
             let ⟨x, hx⟩ := pick_fresh t (L ∪ (fv t''))
@@ -294,14 +289,14 @@ theorem SC_lambda A1 A2 t : lc (λ t)
             apply beta_red_subst_out _ _ _ _ ⟨a x hx.1, (SC_regular _ _ scu)⟩
             apply CR2 _ _ _ hy (beta_to_multi_red _ _ this3)
             rfl
-        next u1' lct' u'bu1 =>
-          apply ihu' u1' u'bu1
-          have this5 := (beta_red_regular _ _ u'bu1).2
-          exact ⟨this5, CR2 _ _ _ Hu.2 (beta_to_multi_red _ _ u'bu1)⟩
+        next u1' lct' ubu1 =>
+          apply ihu u1' ubu1
+          have this5 := (beta_red_regular _ _ ubu1).2
+          exact ⟨this5, CR2 _ _ _ Hu.2 (beta_to_multi_red _ _ ubu1)⟩
           intro t1 bred t2 typ2 F2 op2 q2
           apply CR2
           apply iht' t1 bred _ typ2 F2 op2 q2
-          apply (beta_to_multi_red _ _ (beta_red.br_app2 _ _ _ (typ2) u'bu1))
+          apply (beta_to_multi_red _ _ (beta_red.br_app2 _ _ _ (typ2) ubu1))
 
 -- We can generalize the previous theorem:
 -- Suppose for all strongly computable u, the opened term tᵘ is strongly computable.
@@ -309,8 +304,8 @@ theorem SC_lambda A1 A2 t : lc (λ t)
 theorem SC_lambda_term A1 A2 t : lc (λ t)
     → (∀ u, u ∈ SC A1 → (open₀ t u) ∈ SC A2)
     → (λ t) ∈ SC (A1 -> A2) := by
-  intro typt F
-  apply SC_lambda _ _ _ typt
+  intro lct F
+  apply SC_lambda _ _ _ lct
   intro u x fvx scu
   rw [← subst_intro _ _ (SC_regular _ _ scu) x fvx]
   apply F u scu
