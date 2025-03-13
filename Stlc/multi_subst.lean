@@ -1,8 +1,6 @@
 import Stlc.basics
 import Stlc.context
 import Stlc.typing
-import Stlc.reductions
-import Stlc.confluence
 
 open Typ
 open Trm

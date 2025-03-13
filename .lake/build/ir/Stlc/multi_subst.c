@@ -1,6 +1,6 @@
 // Lean compiler output
 // Module: Stlc.multi_subst
-// Imports: Init Stlc.basics Stlc.context Stlc.typing Stlc.reductions Stlc.confluence
+// Imports: Init Stlc.basics Stlc.context Stlc.typing
 #include <lean/lean.h>
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunused-parameter"
@@ -357,8 +357,6 @@ lean_object* initialize_Init(uint8_t builtin, lean_object*);
 lean_object* initialize_Stlc_basics(uint8_t builtin, lean_object*);
 lean_object* initialize_Stlc_context(uint8_t builtin, lean_object*);
 lean_object* initialize_Stlc_typing(uint8_t builtin, lean_object*);
-lean_object* initialize_Stlc_reductions(uint8_t builtin, lean_object*);
-lean_object* initialize_Stlc_confluence(uint8_t builtin, lean_object*);
 static bool _G_initialized = false;
 LEAN_EXPORT lean_object* initialize_Stlc_multi__subst(uint8_t builtin, lean_object* w) {
 lean_object * res;
@@ -374,12 +372,6 @@ res = initialize_Stlc_context(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 res = initialize_Stlc_typing(builtin, lean_io_mk_world());
-if (lean_io_result_is_error(res)) return res;
-lean_dec_ref(res);
-res = initialize_Stlc_reductions(builtin, lean_io_mk_world());
-if (lean_io_result_is_error(res)) return res;
-lean_dec_ref(res);
-res = initialize_Stlc_confluence(builtin, lean_io_mk_world());
 if (lean_io_result_is_error(res)) return res;
 lean_dec_ref(res);
 l_Trm_multi__subst___closed__1 = _init_l_Trm_multi__subst___closed__1();

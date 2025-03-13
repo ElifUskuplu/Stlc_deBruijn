@@ -34,7 +34,7 @@ lemma normal_has_no_proper_multi_red (t : Trm) :
 -- a term is normalizable if it has a normal multi-step reduct
 def normalizable (t : Trm) : Prop := ∃ t', ((multi_red t t') ∧ (normal t'))
 
--- a term t is strongly normalizable of any one-step reduction sequence
+-- a term t is strongly normalizable if any one-step reduction sequence
 --starting with t must terminate
 def strongly_normalizable (t : Trm) : Prop :=
   ∀ (f : Nat → Trm), (((f 0 = t) ∧ (∀ n, (beta_red (f n) (f (Nat.succ n))))) → False)
@@ -367,7 +367,7 @@ lemma SC_subst t A : typing Γ t A
 
 -- Final theorem:
 -- By CR1 and substitution lemma, we have every typeable term is strongly normalizing.
-theorem beta_red_strongly_normalizing t T : typing [] t T → SN t := by
+theorem strong_normalization t T : typing [] t T → SN t := by
   intro typt
   apply CR1 T t
   let ⟨x, hx⟩ := pick_fresh t ∅
