@@ -197,15 +197,15 @@ theorem CR_1_3 : ∀ A t,
       . intro u Hu
         have this1 : SN u := (ih1 _).1 Hu.2
         induction this1
-        case sn u' _ ihu =>
-        apply (ih2 (t @ u')).2 (lc_app _ _ lct Hu.1) (by simp)
+        case sn u _ ihu =>
+        apply (ih2 (t @ u)).2 (lc_app _ _ lct Hu.1) (by simp)
         intro t' tubt'
         cases tubt'
         next a _ _ =>
           simp [neutral] at nt
         next a tba lcu =>
           have this2 : a ∈ SC (A1 -> A2) := (F a tba)
-          apply (this2.2 u' Hu)
+          apply (this2.2 u Hu)
         next c lct ubc =>
           apply ihu c ubc
           constructor

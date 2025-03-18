@@ -18,8 +18,8 @@ namespace Trm
 
 -- Notations --
 notation t1 " -> " t2 => Typ.typ_arrow t1 t2
-notation "€" t => bvar t
-notation "$" t => fvar t
+notation "€" i => bvar i
+notation "$" x => fvar x
 notation "λ" t => abs t
 notation t1 " @ " t2 => app t1 t2
 
@@ -40,7 +40,7 @@ def subst (x : ℕ) (a : Trm) : Trm → Trm
 | abs u => abs (subst x a u)
 | app u1 u2 => app (subst x a u1) (subst x a u2)
 
-notation  "["x" // " a"] "u => subst x a u
+notation  "["x" // "u"] "t => subst x u t
 
 -- Example of substitutions --
 #eval [4//($3)] λ($4) --yields λ($3)
@@ -51,27 +51,27 @@ notation  "["x" // " a"] "u => subst x a u
 def fv : Trm → Finset ℕ
 | bvar _ => {}
 | fvar y => {y}
-| abs u => fv u
-| app u1 u2 => (fv u1) ∪ (fv u2)
+| abs t => fv t
+| app t1 t2 => (fv t1) ∪ (fv t2)
 
 --We can always pick a fresh variable for a given term out of a fixed set.
 lemma pick_fresh (t : Trm) (L : Finset ℕ) : ∃ (x : ℕ), x ∉ (L ∪ fv t) := by
   exact Infinite.exists_not_mem_finset (L ∪ fv t)
 
 -- If a variable does not appear free in a term, then substituting for it has no effect --
-lemma subst_fresh (t s : Trm) (y : ℕ) (h : y ∉ (fv t)) : ([y // s] t) = t := by
+lemma subst_fresh (t u : Trm) (y : ℕ) (h : y ∉ (fv t)) : ([y // u] t) = t := by
   induction t
   case bvar i =>
     rfl
-  case fvar i =>
+  case fvar x =>
     simp only [subst]
     rw [if_neg]
     simp [fv] at h
     exact (fun p => h (p.symm))
-  case abs u hu =>
+  case abs t ht =>
     simp only [subst, abs.injEq]
-    exact (hu h)
-  case app u1 u2 h1 h2 =>
+    exact (ht h)
+  case app t1 t2 h1 h2 =>
     simp only [subst, app.injEq]
     simp [fv] at h
     exact ⟨(h1 h.1), (h2 h.2)⟩

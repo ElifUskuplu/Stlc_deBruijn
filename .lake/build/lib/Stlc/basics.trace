@@ -13,4 +13,4 @@
   {"message":
    "././././Stlc/basics.lean:48:0: Trm.app (Trm.abs (Trm.bvar 0)) (Trm.fvar 3)",
    "level": "info"}],
- "depHash": "12861274039177556205"}
+ "depHash": "3441423707974262174"}

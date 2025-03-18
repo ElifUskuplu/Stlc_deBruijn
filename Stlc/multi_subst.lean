@@ -1,6 +1,6 @@
 import Stlc.basics
 import Stlc.context
-import Stlc.typing
+import Stlc.reductions
 
 open Typ
 open Trm
@@ -8,7 +8,6 @@ open subst
 open beta_red
 open multi_red
 open lc
-open typing
 
 namespace Trm
 
@@ -25,19 +24,19 @@ def multi_subst (L : Finset ℕ) (f : L → Trm) : Trm → Trm
 def context_type Γ (x : context_terms Γ) : Typ :=
   match Γ, x with
   | [], ⟨_, h⟩ => by simp [context_terms] at h
-  | (x, b) :: Γ, ⟨x', h⟩ =>
+  | (x, T) :: Γ, ⟨x', h⟩ =>
     if ha : x' = x then
-      b
+      T
     else
       context_type Γ ⟨x', by simpa [context_terms, ha] using h⟩
 
 --substitution over the empty context does nothing
-lemma multi_subst_over_empty_context t (f : context_terms [] → Trm) :
+lemma multi_subst_over_emp t (f : context_terms [] → Trm) :
     (multi_subst (context_terms []) f t) = t := by
   induction t
   case bvar i =>
     simp
-  case fvar i =>
+  case fvar x =>
     simp
   case abs t' ih =>
     simp at ih ⊢
@@ -55,9 +54,9 @@ lemma multi_subst_at_singleton t x T :
   induction t
   case bvar i =>
     simp
-  case fvar i =>
+  case fvar y =>
     simp
-    by_cases h : i = x
+    by_cases h : y = x
     . simp [h]
     . simp [h]
   case abs t' ih =>
@@ -86,10 +85,10 @@ lemma multi_subst_fresh Γ t u y T (h : y ∉ (fv t)) (f : context_terms Γ → 
   induction t
   case bvar i =>
     rfl
-  case fvar i =>
+  case fvar x =>
     simp [fv] at h
     simp only [multi_subst, context_terms, Finset.mem_union, Finset.mem_singleton, add_term]
-    have p : i ≠ y := fun q => h q.symm
+    have p : x ≠ y := fun q => h q.symm
     simp [p]
   case abs u hu =>
     simp only [multi_subst, abs.injEq]
@@ -101,15 +100,15 @@ lemma multi_subst_fresh Γ t u y T (h : y ∉ (fv t)) (f : context_terms Γ → 
 
 
 --substitution over a context distributes over opening
-lemma multi_subst_open_lemma_1 e1 e2 Γ : (f : context_terms Γ → Trm)
+lemma multi_subst_open_lemma_1 t1 t2 Γ : (f : context_terms Γ → Trm)
    → (∀ x (h : x ∈ context_terms Γ), lc (f ⟨x,h⟩)) → (j : ℕ)
-   → (multi_subst (context_terms Γ) f ({j ~> e2} e1))
-     = ({j ~> multi_subst (context_terms Γ) f e2} (multi_subst (context_terms Γ) f e1)) := by
-  induction e1
-  case bvar y =>
+   → (multi_subst (context_terms Γ) f ({j ~> t2} t1))
+     = ({j ~> multi_subst (context_terms Γ) f t2} (multi_subst (context_terms Γ) f t1)) := by
+  induction t1
+  case bvar k =>
     simp
     intros f _ j
-    by_cases hjy : (j = y)
+    by_cases hjy : (j = k)
     . rw [if_pos, if_pos] <;> exact hjy
     . rw [if_neg, if_neg, multi_subst]
       <;> exact hjy

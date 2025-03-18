@@ -20,7 +20,7 @@ open valid_ctx
 open lc
 
 --Typing judgments only allow valid contexts.
-lemma typing_valid_ctx  Γ e T : typing Γ e T → valid_ctx Γ := by
+lemma typing_valid_ctx  Γ t T : typing Γ t T → valid_ctx Γ := by
   intro H
   induction H
   case typ_var _ _ _ h _ =>
@@ -244,9 +244,9 @@ lemma typing_abs_intro Γ x t T1 T2 :
   exact (fun q => hy.2 ((context_terms_iff_in_list _ _).mpr q))
   exact R
 
-lemma preservation_beta_red E e T :
-    typing E e T
-    → ((e' : Trm) →  beta_red e e' → typing E e' T) := by
+lemma preservation_beta_red E t T :
+    typing E t T
+    → ((t' : Trm) →  beta_red t t' → typing E t' T) := by
   intro H
   induction H
   case typ_var φ x S _ _ =>
@@ -284,11 +284,11 @@ lemma preservation_beta_red E e T :
       exact f1
       apply (h2 e2 eve2)
 
-lemma preservation_multi_red E e T :
-    typing E e T
-    → ((e' : Trm) →  multi_red e e' → typing E e' T) := by
-  intro H e' eme'
-  induction eme'
+lemma preservation_multi_red E t T :
+    typing E t T
+    → ((t' : Trm) →  multi_red t t' → typing E t' T) := by
+  intro H t' tmt'
+  induction tmt'
   next _ =>
     exact H
   next t2 t3 _ t2bt3 ih =>

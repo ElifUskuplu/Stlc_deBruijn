@@ -177,8 +177,8 @@ open para
 lemma para_regular : ∀ t1 t2, (para t1 t2) → (lc t1) ∧ (lc t2) := by
   intro t1 t2 t1pt2
   induction t1pt2
-  case para_var s =>
-    exact ⟨lc_var s, lc_var s⟩
+  case para_var x =>
+    exact ⟨lc_var x, lc_var x⟩
   case para_red s1 s1' s2 s2' L _ _ h h' =>
     constructor
     . apply (lc_app (abs s1) s2)
@@ -555,7 +555,7 @@ lemma beta_red_to_para : ∀ t t', beta_red t t' → para t t' := by
     apply (para_abs t1 t1' L)
     exact h
 
-lemma multi_red_to_para : ∀ t t', multi_red t t' → multi_para t t' := by
+lemma multi_red_to_multi_para : ∀ t t', multi_red t t' → multi_para t t' := by
   intro t t' tmrt'
   induction tmrt'
   case mr_refl lct =>
@@ -612,5 +612,5 @@ lemma multi_para_to_multi_red : ∀ t t', multi_para t t' → multi_red t t' := 
 lemma multi_red_iff_multi_para : ∀ t1 t2, (multi_red t1 t2) ↔ (multi_para t1 t2) := by
   intro t1 t2
   constructor
-  . exact (multi_red_to_para t1 t2)
+  . exact (multi_red_to_multi_para t1 t2)
   . exact (multi_para_to_multi_red t1 t2)

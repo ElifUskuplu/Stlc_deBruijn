@@ -14,12 +14,12 @@ def context_terms : context → (Finset ℕ)
 | ((x, _) :: Γ') => {x} ∪ (context_terms Γ')
 
 @[simp]
-def in_context (a : ℕ) : context → Prop
+def in_context (x : ℕ) : context → Prop
 | [] => False
-| (b :: m) => (a = b.1) ∨ (in_context a m)
+| (b :: m) => (x = b.1) ∨ (in_context x m)
 
-lemma context_terms_iff_in_list (a : ℕ) (Γ : context) :
-    (a ∈ context_terms Γ) ↔ in_context a Γ := by
+lemma context_terms_iff_in_list (x : ℕ) (Γ : context) :
+    (x ∈ context_terms Γ) ↔ in_context x Γ := by
   induction Γ
   case nil =>
     simp only [context_terms, Finset.not_mem_empty, in_context]
@@ -27,8 +27,8 @@ lemma context_terms_iff_in_list (a : ℕ) (Γ : context) :
     simp only [context_terms, Finset.mem_union, Finset.mem_singleton, in_context]
     rw [f]
 
-lemma in_context_append_neg (a : ℕ) (Γ Δ : context) :
-    ¬ (in_context a (Γ ++ Δ)) → ¬ (in_context a Γ) ∧ ¬ (in_context a Δ) := by
+lemma in_context_append_neg (x : ℕ) (Γ Δ : context) :
+    ¬ (in_context x (Γ ++ Δ)) → ¬ (in_context x Γ) ∧ ¬ (in_context x Δ) := by
   intro H
   induction Γ
   case nil =>
@@ -38,8 +38,8 @@ lemma in_context_append_neg (a : ℕ) (Γ Δ : context) :
     simp [in_context] at H f ⊢
     exact ⟨⟨H.1, (f (H.2)).1⟩, (f (H.2)).2⟩
 
-lemma in_context_append_neg' (a : ℕ) (Γ Δ : context) :
-    ¬ (in_context a Γ) ∧ ¬ (in_context a Δ) → ¬ (in_context a (Γ ++ Δ)) := by
+lemma in_context_append_neg' (x : ℕ) (Γ Δ : context) :
+    ¬ (in_context x Γ) ∧ ¬ (in_context x Δ) → ¬ (in_context x (Γ ++ Δ)) := by
   rintro ⟨H1, H2⟩
   induction Γ
   case nil =>
