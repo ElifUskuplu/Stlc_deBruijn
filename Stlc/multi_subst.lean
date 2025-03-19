@@ -194,10 +194,10 @@ lemma multi_subst_lc t Γ : lc t
       exact (lc_var y)
   case lc_abs u L a hu =>
     simp
-    apply lc_abs _ (L ∪ (context_terms Γ) ∪ (fv u))
+    apply lc_abs _ (L ∪ (context_terms Γ))
     intro x hx
     simp at hx
-    rw [← multi_subst_open Γ u x hx.2.1 f lcf]
+    rw [← multi_subst_open Γ u x hx.2 f lcf]
     apply hu x hx.1
   case lc_app u1 u2 lcu1 lcu2 hu1 hu2 =>
     dsimp [multi_subst]
