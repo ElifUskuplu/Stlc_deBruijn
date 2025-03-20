@@ -7,3 +7,4 @@ import Stlc.normalization
 import Stlc.open_close
 import Stlc.reductions
 import Stlc.typing
+import Stlc.decidable
