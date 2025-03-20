@@ -7,7 +7,7 @@ open typing
 open valid_ctx
 open lc
 
-theorem typing_uniq :
+theorem typing_unique :
     ∀ t, lc t → ∀ Γ T1 T2,
     typing Γ t T1 → typing Γ t T2 → T1 = T2 := by
   intro t lct
@@ -87,12 +87,10 @@ theorem typing_decidable :
                 hz.2.2 ((not_context_terms_to_not_in_context _ _ hz.2.1))
                 hx.2.2 ((not_context_terms_to_not_in_context _ _ hx.2.1)) (h z hz.1)
   case lc_app t1 t2 lc1 lc2 ih1 ih2 =>
-    have this := ih1 Γ vld
-    have this2 := ih2 Γ vld
-    cases this
+    cases (ih1 Γ vld)
     next pos =>
       rcases pos with ⟨T,p1⟩
-      cases this2
+      cases (ih2 Γ vld)
       next pos2 =>
         rcases pos2 with ⟨S,p2⟩
         match T with
@@ -101,8 +99,8 @@ theorem typing_decidable :
           rintro ⟨T, P⟩
           cases P
           next S ty1 ty2 =>
-            have q:= typing_uniq _ lc1 _ _ _ p1 ty2
-            simp at q
+            have q:= typing_unique _ lc1 _ _ _ p1 ty2
+            simp at (q)
         | typ_arrow S1 S2 =>
           by_cases h : S1 = S
           . left
@@ -113,9 +111,9 @@ theorem typing_decidable :
             rintro ⟨U, P⟩
             cases P
             next V ty1 ty2 =>
-              have q := typing_uniq _ lc1 _ _ _ p1 ty2
+              have q := typing_unique _ lc1 _ _ _ p1 ty2
               simp at q
-              have q' := typing_uniq _ lc2 _ _ _ p2 ty1
+              have q' := typing_unique _ lc2 _ _ _ p2 ty1
               rw [← q'] at q
               apply (h q.1)
       next neg2 =>
@@ -130,3 +128,22 @@ theorem typing_decidable :
       cases P
       next T1 ty1 ty2 =>
         apply neg ⟨_ , ty2⟩
+
+theorem typechecking_decidable t T Γ :
+    lc t → valid_ctx Γ → (typing Γ t T) ∨ ¬(typing Γ t T) := by
+  intro lct vld
+  have this := typing_decidable t Γ lct vld
+  cases this
+  next pos =>
+    rcases pos with ⟨S, P⟩
+    by_cases h : S = T
+    . rw [h] at P
+      exact (Or.inl P)
+    . right
+      intro Q
+      have q := typing_unique _ lct _ _ _ P Q
+      exact h q
+  next neg =>
+    right
+    simp at neg
+    exact neg T
