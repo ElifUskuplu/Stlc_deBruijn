@@ -146,7 +146,7 @@ lemma SC_regular A t : t ∈ (SC A) → lc t := by
 def neutral : Trm → Prop
 | bvar _ => true
 | fvar _ => true
-| abs _ => false
+| abs _ _ => false
 | app _ _ => true
 
 -- CR2 says that if t is strongly computable, then any multi-step reduct of t
@@ -233,9 +233,9 @@ lemma SC_var A x : ($ x) ∈ SC A := by
 -- Criteria for strongly computable lambda terms:
 -- Suppose for all variable x not occured in t and strongly computable u, we have
 -- [x//u]tˣ is strongly computable. Then λt is strongly computable.
-theorem SC_lambda A1 A2 t : lc (λ t)
+theorem SC_lambda A1 A2 t : lc (λA1, t)
     → (∀ u x, x ∉ fv t → u ∈ SC A1 → ([x // u] (open₀ t ($ x))) ∈ SC A2)
-    → (λ t) ∈ SC (A1 -> A2) := by
+    → (λ A1, t) ∈ SC (A1 -> A2) := by
   intro lct F
   have this : (∃ y, (open₀ t ($ y)) ∈ SC A2) := by
     let ⟨y, hy⟩ := pick_fresh t ∅
@@ -271,12 +271,12 @@ theorem SC_lambda A1 A2 t : lc (λ t)
           next t'' L a =>
             let ⟨x, hx⟩ := pick_fresh t (L ∪ (fv t''))
             simp at hx
-            have this3 : beta_red (open₀ t ($ y))  (open₀ t'' ($ y)) := by
+            have this3 : beta_red (open₀ t ($ y)) (open₀ t'' ($ y)) := by
               rw [subst_intro t ($ y) (lc_var y) x hx.2.2]
               rw [subst_intro t'' ($ y) (lc_var y) x hx.2.1]
               apply beta_rename _ _ _ _ (a x hx.1)
             apply (iht' (open₀ t'' ($ y)) this3 t''
-                (beta_red_regular _ _ (beta_red.br_abs _ _ _ a)).2)
+                (beta_red_regular _ _ (beta_red.br_abs _ _ _ _ a)).2)
             intro u z hz scu
             rw [← subst_intro t'' u (SC_regular _ _ scu) z hz]
             have this4 : open₀ t u ∈ SC A2 := by
@@ -301,9 +301,9 @@ theorem SC_lambda A1 A2 t : lc (λ t)
 -- We can generalize the previous theorem:
 -- Suppose for all strongly computable u, the opened term tᵘ is strongly computable.
 -- Then λt is strongly computable.
-theorem SC_lambda_term A1 A2 t : lc (λ t)
+theorem SC_lambda_term A1 A2 t : lc (λ A1,t)
     → (∀ u, u ∈ SC A1 → (open₀ t u) ∈ SC A2)
-    → (λ t) ∈ SC (A1 -> A2) := by
+    → (λ A1, t) ∈ SC (A1 -> A2) := by
   intro lct F
   apply SC_lambda _ _ _ lct
   intro u x fvx scu

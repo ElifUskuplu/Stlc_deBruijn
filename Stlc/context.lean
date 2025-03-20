@@ -27,6 +27,11 @@ lemma context_terms_iff_in_list (x : ℕ) (Γ : context) :
     simp only [context_terms, Finset.mem_union, Finset.mem_singleton, in_context]
     rw [f]
 
+lemma not_context_terms_to_not_in_context x Γ :
+    ¬ (x ∈ context_terms Γ) →  ¬ in_context x Γ := by
+  rw [context_terms_iff_in_list]
+  simp
+
 lemma in_context_append_neg (x : ℕ) (Γ Δ : context) :
     ¬ (in_context x (Γ ++ Δ)) → ¬ (in_context x Γ) ∧ ¬ (in_context x Δ) := by
   intro H

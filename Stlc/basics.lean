@@ -10,7 +10,7 @@ deriving DecidableEq, Repr
 inductive Trm : Type
 | bvar : ℕ → Trm
 | fvar : ℕ → Trm
-| abs : Trm → Trm
+| abs : Typ → Trm → Trm
 | app : Trm → Trm → Trm
 deriving DecidableEq, Repr
 
@@ -20,38 +20,24 @@ namespace Trm
 notation t1 " -> " t2 => Typ.typ_arrow t1 t2
 notation "€" i => bvar i
 notation "$" x => fvar x
-notation "λ" t => abs t
+notation "λ " T "," t => abs T t
 notation t1 " @ " t2 => app t1 t2
-
--- Example of terms --
--- λ.0 means λx.x in named syntax
-#check λ(€0)
--- λ.y means λx.y in named syntax (in our case, y:nat again)
-variable (y : ℕ)
-#check λ($ y)
--- (λ.0)y means we apply variable y to the function λx.x
-#check (λ(€0)) @ ($ y)
 
 -- Defining free variable substitution by induction on terms --
 @[simp]
 def subst (x : ℕ) (a : Trm) : Trm → Trm
 | bvar i => bvar i
 | fvar y => if y = x then a else (fvar y)
-| abs u => abs (subst x a u)
+| abs T u => abs T (subst x a u)
 | app u1 u2 => app (subst x a u1) (subst x a u2)
 
 notation  "["x" // "u"] "t => subst x u t
-
--- Example of substitutions --
-#eval [4//($3)] λ($4) --yields λ($3)
-#eval [4//($3)] λ(€0) --yields λ(€0)
-#eval [4//($3)] (λ(€0)) @ ($4) --yields (λ(€0)) @ ($3)
 
 -- Set of free variables --
 def fv : Trm → Finset ℕ
 | bvar _ => {}
 | fvar y => {y}
-| abs t => fv t
+| abs _ t => fv t
 | app t1 t2 => (fv t1) ∪ (fv t2)
 
 --We can always pick a fresh variable for a given term out of a fixed set.
@@ -68,8 +54,10 @@ lemma subst_fresh (t u : Trm) (y : ℕ) (h : y ∉ (fv t)) : ([y // u] t) = t :=
     rw [if_neg]
     simp [fv] at h
     exact (fun p => h (p.symm))
-  case abs t ht =>
+  case abs T t ht =>
     simp only [subst, abs.injEq]
+    constructor
+    simp only
     exact (ht h)
   case app t1 t2 h1 h2 =>
     simp only [subst, app.injEq]

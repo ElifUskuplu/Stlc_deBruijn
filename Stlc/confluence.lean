@@ -23,7 +23,7 @@ lemma para_diamond t t1 :
     intro t2 tpt2
     use t2
     exact ⟨tpt2, lc_para_refl t2 (para_regular _ _ tpt2).2⟩
-  case para_red s1 s1' s2 s2' L _ s2ps2' ih1 ih2 =>
+  case para_red s1 s1' s2 s2' T L _ s2ps2' ih1 ih2 =>
     intro t2 tpt2
     cases tpt2
     case para_red u1' u2' L' f' s2pu2' =>
@@ -58,7 +58,7 @@ lemma para_diamond t t1 :
           rw [open_close_var _ _ (para_regular _ _ qt''.1).2]
           exact qt''.1
           exact qt'.1
-        . apply para_red _ _ _ _ (fv (open₀ s1'' ($ x)) ∪ fv t'' ∪ {x})
+        . apply para_red _ _ _ _ _ (fv (open₀ s1'' ($ x)) ∪ fv t'' ∪ {x})
           intro y qy
           rw [← close_open_var x s1'' qx.2.2.1]
           apply open_close_para _ _ _ _ qt''.2 qy
@@ -66,15 +66,15 @@ lemma para_diamond t t1 :
   case para_app s1 s1' s2 s2' s1ps1' _ ih1 ih2 =>
       intro t2 tpt2
       cases tpt2
-      case para_red t1' u1' u2' L f s2pu2' =>
+      case para_red t1' u1' u2' T L f s2pu2' =>
         cases s1ps1'
         next s1'' L' f' =>
           let ⟨x, qx⟩ := pick_fresh u1' (L ∪ L' ∪ (fv s1''))
           simp at qx
           have fact1: ∃ t', para s2' t' ∧ para u2' t' := by
             apply ih2 _ s2pu2'
-          have fact2 : ∃ t', para (λ s1'') t' ∧ para (λ u1') t' := by
-            apply ih1 (λ u1') (para_abs _ _ L f)
+          have fact2 : ∃ t', para (λT, s1'') t' ∧ para (λT, u1') t' := by
+            apply ih1 (λT, u1') (para_abs _ _ _ L f)
           rcases fact1 with ⟨t', qt'⟩
           rcases fact2 with ⟨t'', qt''⟩
           cases qt''.1
@@ -83,7 +83,7 @@ lemma para_diamond t t1 :
             next L''' f''' =>
               use (open₀ w1 t')
               constructor
-              . apply para_red _ _ _ _ L'' f'' qt'.1
+              . apply para_red _ _ _ _ _ L'' f'' qt'.1
               . apply para_open_out _ _ _ _ L''' f''' qt'.2
       case para_app u1 u2' s1pu1 s2pu2' =>
         have fact1: ∃ t', para s1' t' ∧ para u1 t' := by
@@ -96,7 +96,7 @@ lemma para_diamond t t1 :
         constructor
         . apply para_app _ _ _ _ qt'.1 qt''.1
         . apply para_app _ _ _ _ qt'.2 qt''.2
-  case para_abs s1 s2' L _ ih =>
+  case para_abs s1 s2' T L _ ih =>
     intro t2 tpt2
     cases tpt2
     next t2' L' f' =>
@@ -104,13 +104,13 @@ lemma para_diamond t t1 :
       simp at qx
       have fact1 := ih x qx.1 _ (f' x qx.2.1)
       rcases fact1 with ⟨t', qt'⟩
-      use (λ (close₀ t' x))
+      use (λT, (close₀ t' x))
       constructor
-      . apply para_abs _ _ (fv (open₀ s2' ($ x)) ∪ fv t' ∪ {x})
+      . apply para_abs _ _ _ (fv (open₀ s2' ($ x)) ∪ fv t' ∪ {x})
         intro y qy
         rw [← close_open_var x s2' qx.2.2.2]
         apply open_close_para _ _ _ _ qt'.1 qy
-      . apply para_abs _ _ (fv (open₀ t2' ($ x)) ∪ fv t' ∪ {x})
+      . apply para_abs _ _ _ (fv (open₀ t2' ($ x)) ∪ fv t' ∪ {x})
         intro y qy
         rw [← close_open_var x t2' qx.2.2.1]
         apply open_close_para _ _ _ _ qt'.2 qy

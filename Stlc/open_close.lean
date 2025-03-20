@@ -11,17 +11,10 @@ It is used to build an abstraction given a representation of its body. -/
 def opening (k : ℕ) (u : Trm) : Trm → Trm
 | bvar i => if k = i then u else (bvar i)
 | fvar x => fvar x
-| abs t => abs (opening (k + 1) u t)
+| abs T t => abs T (opening (k + 1) u t)
 | app t1 t2 => app (opening k u t1) (opening k u t2)
 
 notation " {" k " ~> " u "} " t => opening k u t
-
--- Example of opening --
-#eval {0 ~> $2} λ(€0) --does not change since λ.0 is a closed term
-#eval {0 ~> $2} λ(€1) --becomes λ($2)
-#eval {0 ~> $4} λ(λ(€1)) -- does not change since λ.λ.1 is a closed term
-#eval {0 ~> $4} λ(λ(€2)) -- becomes λ(λ($4))
-
 
 --Opening at index zero
 def open₀ t u := opening 0 u t
@@ -39,7 +32,7 @@ lemma open_var_fv (t u: Trm) :
       simp
   case fvar x =>
     simp [opening, fv]
-  case abs t ht =>
+  case abs T t ht =>
     simp [opening, fv]
     exact (fun k => ht (k + 1))
   case app t1 t2 ht1 ht2 =>
@@ -71,7 +64,7 @@ lemma opening_lc_lemma (t u v : Trm) :
   case fvar y =>
    intro i j _ _
    rfl
-  case abs u hu =>
+  case abs T u hu =>
    intro i j neqij h
    simp [opening] at h
    simp [opening]
@@ -89,15 +82,10 @@ lemma opening_lc_lemma (t u v : Trm) :
 def closing (k x : ℕ) : Trm → Trm
 | bvar i => bvar i
 | fvar i => if x = i then (bvar k) else (fvar i)
-| abs t => abs (closing (k + 1) x t)
+| abs T t => abs T (closing (k + 1) x t)
 | app t1 t2 => app (closing k x t1) (closing k x t2)
 
 notation " { " k " <~ " x " } " t => closing k x t
-
--- Example of closing --
-#eval {0 <~ 2} λ($1) -- does not change since λx.1 does not contain the variable we want to change
-#eval {0 <~ 2} λ($2) --becomes λ(€1), it builds the abstraction λ.λ.1 as expected
-#eval {0 <~ 4} λ(λ($4)) -- becomes λ(λ(€2)), it builds the abstraction λ.λ.λ.2 as expected
 
 --Closing at index zero
 def close₀ u x := closing 0 x u
@@ -115,7 +103,7 @@ lemma close_var_fv (t : Trm) (x : ℕ) :
       simp
     . rw [if_neg hy, fv]
       simp [hy]
-  case abs u hu =>
+  case abs T u hu =>
     intro k
     simp [closing, fv]
     exact (hu (k + 1))
@@ -129,44 +117,25 @@ lemma close_var_fv (t : Trm) (x : ℕ) :
 --Locally closed terms
 inductive lc : Trm → Prop
 | lc_var : ∀ x : ℕ, lc (fvar x)
-| lc_abs : ∀ t : Trm, ∀ L : Finset ℕ,
-   (∀ x : ℕ, x ∉ L → lc (open₀ t ($ x))) → lc (abs t)
+| lc_abs : ∀ t : Trm, ∀ T : Typ, ∀ L : Finset ℕ,
+   (∀ x : ℕ, x ∉ L → lc (open₀ t ($ x))) → lc (abs T t)
 | lc_app : ∀ t1 t2 : Trm, lc t1 → lc t2 → lc (app t1 t2)
 
 open lc
-
---As an example, while λ.0 is locally closed, λ.3 is not.
-lemma ex1: (lc (λ (€ 0))) ↔ True := by
-  simp only [iff_true]
-  apply lc_abs (€0) ∅
-  simp [open₀]
-  intro x
-  exact lc_var x
-
-lemma ex2: (lc (λ (€ 3))) ↔ False := by
-  simp only [iff_false]
-  intro u
-  cases u
-  next L a =>
-    have  ⟨x, hx⟩ : ∃ x : ℕ, x ∉ L := by
-      exact Infinite.exists_not_mem_finset L
-    have s := a x hx
-    simp [open₀] at s
-    cases s
 
 /-The predicate “body t” asserts that t describes
 the body of a locally closed abstraction.-/
 def body t := ∃ (L : Finset ℕ), ∀ x, x ∉ L → lc (open₀ t ($ x))
 
-lemma lc_abs_iff_body : ∀ t, lc (abs t) ↔ body t := by
-  intro t
+lemma lc_abs_iff_body : ∀ t T, lc (abs T t) ↔ body t := by
+  intro t T
   constructor
   . intro h
     cases h
     next L a =>
       use L
   . rintro ⟨L, h⟩
-    exact (lc_abs t L h)
+    exact (lc_abs t T L h)
 ----------------------------------------------------------------------
 /-The following lemmas show that opening and closing
 are inverses of each other on variables.-/
@@ -248,11 +217,13 @@ lemma open_close_lemma (x y z : ℕ) (t : Trm) : x ≠ y → y ∉ fv t
     . simp only [opening, closing]
       rw [if_neg hxa]
       simp only [opening]
-  case abs u hu =>
+  case abs T u hu =>
     simp only [ne_eq, opening, abs.injEq]
     rw [fv] at hy
     intro i j neqij
     simp only [closing, opening, abs.injEq]
+    constructor
+    simp only
     apply (hu hy (i + 1) (j + 1))
     exact Iff.mpr Nat.succ_ne_succ neqij
   case app u1 u2 hu1 hu2 =>
@@ -275,7 +246,7 @@ lemma open_close (x : ℕ) (t : Trm) :
     . rw [if_neg]
       simp [closing]
       exact hxy
-  case lc_abs u L _ hu =>
+  case lc_abs u T L _ hu =>
     intro j
     simp [closing, opening]
     let ⟨y, hy⟩ := pick_fresh u (L ∪ (fv ($ x)) ∪ (fv (( {j + 1 ~> $ x} { j + 1 <~ x } u))))
@@ -316,7 +287,7 @@ lemma opening_lc (t u : Trm) : lc t → (k : ℕ) → (t = {k ~> u} t) := by
   case lc_var x =>
     intro _
     rfl
-  case lc_abs v L _ hv =>
+  case lc_abs v T L _ hv =>
     intro i
     simp [open₀] at hv
     rw [opening]
@@ -360,7 +331,7 @@ lemma subst_open_rec (t1 t2 u : Trm) : (i j : ℕ) → lc u
      rw [if_neg]
      exact (opening_lc ($ y) ([ i // u ] t2) (lc.lc_var y) j)
      exact hyi
-  case abs v hv =>
+  case abs T v hv =>
    intro i j lcu
    simp [opening, subst]
    exact (hv i (j + 1) lcu)
@@ -404,8 +375,8 @@ lemma subst_lc (t u : Trm) : (x : ℕ) → lc t → lc u → lc ([x // u] t) := 
     . rw [if_neg]
       exact (lc_var y)
       exact hxy
-  case lc_abs v L _ hv =>
-    apply (lc_abs ([ x // u ] v) (L ∪ {x}))
+  case lc_abs v T L _ hv =>
+    apply (lc_abs ([ x // u ] v) T (L ∪ {x}))
     intro x₀ hx₀
     have t1 : x₀ ∉ L := by
       intro s
@@ -432,7 +403,7 @@ lemma open_var_body : ∀ x t, body t → lc (open₀ t ($ x)) := by
   exact (a y hy.1)
   exact (lc_var x)
 
-lemma open_var_lc : ∀ x t, lc (abs t) → lc (open₀ t ($ x)) := by
+lemma open_var_lc : ∀ x t, lc (abs T t) → lc (open₀ t ($ x)) := by
   intro x t lcat
   rw [lc_abs_iff_body t] at lcat
   exact (open_var_body x t lcat)
@@ -447,7 +418,7 @@ lemma open_body : ∀ t u, body t → lc u → lc (open₀ t u) := by
   exact (subst_lc (open₀ t ($ y)) u y (a y hy.1) lcu)
 
 --general version of open_var_lc
-lemma open_lc : ∀ t u, lc (abs t) → lc u → lc (open₀ t u) := by
+lemma open_lc : ∀ t u, lc (abs T t) → lc u → lc (open₀ t u) := by
   intro t u lcat lcu
   rw [lc_abs_iff_body t] at lcat
   exact (open_body t u lcat lcu)
@@ -462,7 +433,7 @@ lemma open_close_subst t x y :
     . simp [if_pos hxy, if_pos hxy.symm]
     . have hyx : y ≠ x := (fun p => (hxy p.symm))
       simp [if_neg hxy, if_neg hyx]
-  case lc_abs s L f h =>
+  case lc_abs s T L f h =>
     simp [opening, subst, abs.injEq]
     intro k
     let ⟨w, qw⟩ := pick_fresh s (L ∪ {x} ∪ (fv ( {k + 1 ~> $ y} { k + 1 <~ x } s)) ∪ (fv ([x // $ y] s)))

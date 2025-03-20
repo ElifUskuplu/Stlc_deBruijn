@@ -10,7 +10,7 @@ open typing
 open lc
 
 inductive value : Trm → Prop
-| value_abs : ∀ e, lc (abs e) → value (abs e)
+| value_abs : ∀ e T, lc (abs T e) → value (abs T e)
 
 open value
 
@@ -22,7 +22,7 @@ lemma value_regular (t : Trm) : value t → lc t := by
 
 --call by value
 inductive eval : Trm → Trm → Prop
-| eval_beta : ∀ e1 e2, lc (abs e1) → value e2 → eval (app (abs e1) e2) (open₀ e1 e2)
+| eval_beta : ∀ e1 e2 T, lc (abs T e1) → value e2 → eval (app (abs T e1) e2) (open₀ e1 e2)
 | eval_app1 : ∀ e1 e1' e2, lc e2 → eval e1 e1' → eval (app e1 e2) (app e1' e2)
 | eval_app2 : ∀ e1 e2 e2', lc e1 → eval e2 e2' → eval (app e1 e2) (app e1 e2')
 
@@ -68,7 +68,7 @@ lemma preservation E e T : typing E e T → ((e' : Trm) →  eval e e' → typin
   case typ_app φ t1 t2 S1 S2 f1 f2 h1 h2 =>
     intro e' p
     cases p
-    next e1 lce1 g =>
+    next e1 T lce1 g =>
       cases f1
       next L h =>
         let ⟨x, hx⟩ := pick_fresh e1 L
@@ -97,7 +97,7 @@ lemma progress e T : typing [] e T → (value e) ∨ (∃ e', eval e e') := by
   case typ_abs L Δ s S1 S2 f _ =>
     left
     apply value_abs
-    apply lc_abs s L
+    apply lc_abs s S1 L
     intro x hx
     exact (typing_regular _ _ _ (f x hx))
   case typ_app Δ s1 s2 S1 S2 f g h1 h2 =>
@@ -107,7 +107,7 @@ lemma progress e T : typing [] e T → (value e) ∨ (∃ e', eval e e') := by
     by_cases val1 : value s1
     . by_cases val2 : value s2
       . cases val1
-        next s3 lcs3 =>
+        next s3 T lcs3 =>
           use (open₀ s3 s2)
           apply eval_beta
           exact lcs3

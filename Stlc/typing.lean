@@ -11,7 +11,7 @@ open List
 inductive typing : context → Trm → Typ → Prop
 | typ_var (Γ : context) (x : ℕ) (T : Typ) : (valid_ctx Γ) → (binds x T Γ) → (typing Γ ($ x) T)
 | typ_abs (L : Finset ℕ) (Γ : context) (t : Trm) (T1 T2 : Typ) :
-        ((x : ℕ) → x ∉ L → (typing ((x, T1) :: Γ) (open₀ t ($ x)) T2)) → (typing Γ (abs t) (typ_arrow T1 T2))
+        ((x : ℕ) → x ∉ L → (typing ((x, T1) :: Γ) (open₀ t ($ x)) T2)) → (typing Γ (abs T1 t) (typ_arrow T1 T2))
 | typ_app (Γ : context) (t₁ t₂ : Trm) (T1 T2 : Typ) :
         (typing Γ t₁ (typ_arrow T1 T2)) → (typing Γ t₂ T1) → typing Γ (app t₁ t₂) T2
 
@@ -128,8 +128,8 @@ lemma typing_regular (t : Trm) (T : Typ) (Γ : context) :
   induction H
   case typ_var _ x _ _ _ =>
     exact (lc.lc_var x)
-  case typ_abs L _ u _ _ _ h' =>
-    apply (lc.lc_abs u L)
+  case typ_abs L _ u T1 _ _ h' =>
+    apply (lc.lc_abs u T1 L)
     intro x hx
     exact (h' x hx)
   case typ_app _ t1 t2 _ _ _ _ f1 f2 =>
@@ -234,7 +234,7 @@ lemma typing_rename Γ x y t T1 T2 :
 lemma typing_abs_intro Γ x t T1 T2 :
     x ∉ fv t →  ¬ (in_context x Γ)
     → typing ((x, T1) :: Γ) (open₀ t ($ x)) T2
-    → typing Γ (abs t) (T1 -> T2) := by
+    → typing Γ (abs T1 t) (T1 -> T2) := by
   intro hx fx R
   apply typ_abs (fv t ∪ context_terms Γ)
   intro y hy
@@ -264,7 +264,7 @@ lemma preservation_beta_red E t T :
   case typ_app φ t1 t2 S1 S2 f1 f2 h1 h2 =>
     intro e' p
     cases p
-    next e1 lce1 g =>
+    next e1 T lce1 g =>
       cases f1
       next L h =>
         let ⟨x, hx⟩ := pick_fresh e1 L

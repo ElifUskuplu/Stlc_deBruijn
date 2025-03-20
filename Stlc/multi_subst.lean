@@ -16,7 +16,7 @@ namespace Trm
 def multi_subst (L : Finset ℕ) (f : L → Trm) : Trm → Trm
 | bvar i => bvar i
 | fvar y => if h : (y ∈ L) then (f ⟨y, h⟩) else (fvar y)
-| abs u => abs (multi_subst L f u)
+| abs T u => abs T (multi_subst L f u)
 | app u1 u2 => app (multi_subst L f u1) (multi_subst L f u2)
 
 --context_type takes a term in a context and outputs its type
@@ -38,7 +38,7 @@ lemma multi_subst_over_emp t (f : context_terms [] → Trm) :
     simp
   case fvar x =>
     simp
-  case abs t' ih =>
+  case abs T t' ih =>
     simp at ih ⊢
     rw [ih]
   case app t1 t2 ih1 ih2 =>
@@ -59,7 +59,7 @@ lemma multi_subst_at_singleton t x T :
     by_cases h : y = x
     . simp [h]
     . simp [h]
-  case abs t' ih =>
+  case abs T t' ih =>
     simp
     exact ih
   case app t1 t2 ih1 ih2 =>
@@ -90,8 +90,10 @@ lemma multi_subst_fresh Γ t u y T (h : y ∉ (fv t)) (f : context_terms Γ → 
     simp only [multi_subst, context_terms, Finset.mem_union, Finset.mem_singleton, add_term]
     have p : x ≠ y := fun q => h q.symm
     simp [p]
-  case abs u hu =>
+  case abs T u hu =>
     simp only [multi_subst, abs.injEq]
+    constructor
+    simp only
     exact (hu h)
   case app u1 u2 h1 h2 =>
     simp only [multi_subst, app.injEq]
@@ -118,7 +120,7 @@ lemma multi_subst_open_lemma_1 t1 t2 Γ : (f : context_terms Γ → Trm)
    . simp [opening, multi_subst, hy]
      exact (opening_lc (f ⟨y, hy⟩) _ (lcf y hy) _)
    . simp [opening, multi_subst, hy]
-  case abs u ihu =>
+  case abs T u ihu =>
    intro f lcf j
    simp [opening, multi_subst]
    exact (ihu f lcf (j + 1))
@@ -192,9 +194,9 @@ lemma multi_subst_lc t Γ : lc t
       exact (lcf y hxy)
     . simp [if_neg, hxy]
       exact (lc_var y)
-  case lc_abs u L a hu =>
+  case lc_abs u T L a hu =>
     simp
-    apply lc_abs _ (L ∪ (context_terms Γ))
+    apply lc_abs _ _ (L ∪ (context_terms Γ))
     intro x hx
     simp at hx
     rw [← multi_subst_open Γ u x hx.2 f lcf]
