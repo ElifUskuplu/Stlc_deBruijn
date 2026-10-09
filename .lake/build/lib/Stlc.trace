@@ -1,5 +1,0 @@
-{"log":
- [{"message":
-   ".> LEAN_PATH=././.lake/packages/Cli/.lake/build/lib:././.lake/packages/batteries/.lake/build/lib:././.lake/packages/Qq/.lake/build/lib:././.lake/packages/aesop/.lake/build/lib:././.lake/packages/proofwidgets/.lake/build/lib:././.lake/packages/importGraph/.lake/build/lib:././.lake/packages/LeanSearchClient/.lake/build/lib:././.lake/packages/plausible/.lake/build/lib:././.lake/packages/mathlib/.lake/build/lib:././.lake/build/lib LD_LIBRARY_PATH= /home/elifuskuplu/.elan/toolchains/leanprover--lean4---v4.16.0-rc2/bin/lean ././././Stlc.lean -R ./././. -o ././.lake/build/lib/Stlc.olean -i ././.lake/build/lib/Stlc.ilean -c ././.lake/build/ir/Stlc.c --json",
-   "level": "trace"}],
- "depHash": "368634290825314062"}
