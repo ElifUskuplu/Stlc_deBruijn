@@ -1,2 +1,11 @@
+# Lean / Lake build artifacts
+/.lake
 /build
 /lake-packages/*
+
+# Editor and OS files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
